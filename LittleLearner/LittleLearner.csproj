@@ -61,4 +61,10 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\ImportCFG\CfgCompLib.csproj" />
+	  <ProjectReference Include="..\LimitCGenerator\LimitCGenerator.csproj" />
+	  <ProjectReference Include="..\LimitCInterpreter\LimitCInterpreter.csproj" />
+	</ItemGroup>
+
 </Project>
