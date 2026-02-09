@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="LittleLearner.Tabs.LimitCSolver"
-             Title="LimitCSolver">
-    <VerticalStackLayout>
-        <Label 
-            Text="This is my LimitCSolver Page"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             x:Class="LittleLearner.Tabs.LimitCSolver">
+    <Grid ColumnDefinitions="*, *">
+        <Editor BackgroundColor="#003C64" Grid.Column="0" />
+
+        <Grid Grid.Column="1" RowDefinitions="*, Auto">
+            <Label Grid.Row="0" Text="Put your Text here" BackgroundColor="#003C64" />
+
+            <BoxView Grid.Row="1" BackgroundColor="#003C64" />
+            <Button Grid.Row="1" Grid.Column="0" HorizontalOptions="Start" Margin="16, 8, 0, 8" Text="Prüfen"/>
+            <Button Grid.Row="1" Grid.Column="1" HorizontalOptions="End" Margin="0, 8, 16, 8" Text="Lösung"/>
+        </Grid>
+    </Grid>
 </ContentPage>
