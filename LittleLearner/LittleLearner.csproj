@@ -61,4 +61,19 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\ImportCFG\CfgCompLib.csproj" />
+	  <ProjectReference Include="..\LimitCGenerator\LimitCGenerator.csproj" />
+	  <ProjectReference Include="..\LimitCInterpreter\LimitCInterpreter.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Tabs\CfgComparer.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Tabs\LimitCSolver.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 </Project>
