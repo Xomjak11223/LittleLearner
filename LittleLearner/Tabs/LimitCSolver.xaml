@@ -3,8 +3,48 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="LittleLearner.Tabs.LimitCSolver">
     <Grid ColumnDefinitions="*, *">
-        <Editor BackgroundColor="#003C64" Grid.Column="0" />
+        <!--Code-->
+        <AbsoluteLayout>
+            <Editor BackgroundColor="#003C64" AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="XProportional,YProportional,WidthProportional,HeightProportional" />
+            <ImageButton Source="appicon.png" Clicked="toggleCodeCreator" AbsoluteLayout.LayoutBounds="1, 0" AbsoluteLayout.LayoutFlags="XProportional,YProportional" />
+            
+            <!--Automatic Code Generation-->
+            <!--VerticalStackLayout Grid.Row="0" IsVisible="True" BackgroundColor="Purple">
+                <HorizontalStackLayout>
+                    <Label Text="Difficulty" />
 
+                    <Border BackgroundColor="Purple" Stroke="Black">
+                        <Label Text="Easy" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="selectDifficulty"/>
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Border BackgroundColor="Purple" Stroke="Black">
+                        <Label Text="Medium" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="selectDifficulty"/>
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Border BackgroundColor="Purple" Stroke="Black">
+                        <Label Text="Hard" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="selectDifficulty"/>
+                        </Border.GestureRecognizers>
+                    </Border>
+                </HorizontalStackLayout>
+                <HorizontalStackLayout>
+                    <Label Text="Rechenoperationen" />
+                </HorizontalStackLayout>
+
+
+                <Grid HeightRequest="*">
+                    <CheckBox />
+                    
+                </Grid>
+            </VerticalStackLayout-->
+        </AbsoluteLayout>
+
+        <!--Lables-->
         <Grid Grid.Column="1" RowDefinitions="*, Auto">
             <Label Grid.Row="0" Text="Put your Text here" BackgroundColor="#003C64" />
 
