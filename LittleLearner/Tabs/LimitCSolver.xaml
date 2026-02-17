@@ -5,31 +5,31 @@
     <Grid ColumnDefinitions="*, *">
         <!--Code-->
         <AbsoluteLayout>
-            <Editor x:Name="Code" BackgroundColor="#003C64" AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All" />
-            <ImageButton Source="appicon.png" Margin="0, 12, 12, 0" Clicked="toggleCodeCreator" AbsoluteLayout.LayoutBounds="1, 0" AbsoluteLayout.LayoutFlags="PositionProportional" />
+            <Editor x:Name="code" BackgroundColor="#003C64" AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All" />
+            <ImageButton Source="appicon.png" Margin="0, 12, 12, 0" Clicked="ToggleCodeCreator" AbsoluteLayout.LayoutBounds="1, 0" AbsoluteLayout.LayoutFlags="PositionProportional" />
             
             <!--Automatic Code Generation-->
-            <VerticalStackLayout x:Name="CodeCreator" Margin="0, 12, 12, 0" Padding="8" IsVisible="True" BackgroundColor="Purple" AbsoluteLayout.LayoutBounds="1, 0" AbsoluteLayout.LayoutFlags="PositionProportional" Spacing="8">
-                <ImageButton Source="appicon.png" Clicked="toggleCodeCreator" />
+            <VerticalStackLayout x:Name="CodeCreator" Margin="0, 12, 12, 0" Padding="8" IsVisible="False" BackgroundColor="Purple" AbsoluteLayout.LayoutBounds="1, 0" AbsoluteLayout.LayoutFlags="PositionProportional" Spacing="8">
+                <ImageButton Source="appicon.png" Clicked="ToggleCodeCreator" />
                 <HorizontalStackLayout>
                     <Label Text="Difficulty" />
 
-                    <Border BackgroundColor="Purple" Stroke="Black" Margin="4, 0, 4, 0">
+                    <Border x:Name="DifficultyEasy" BackgroundColor="Purple" Stroke="Black" Margin="4, 0, 4, 0">
                         <Label Text="Easy" HorizontalOptions="Center" VerticalOptions="Center"/>
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="selectDifficulty"/>
+                            <TapGestureRecognizer Tapped="SelectDifficulty"/>
                         </Border.GestureRecognizers>
                     </Border>
-                    <Border BackgroundColor="Purple" Stroke="Black" Margin="4, 0, 4, 0">
+                    <Border x:Name="DifficultyMedium"  BackgroundColor="Purple" Stroke="Black" Margin="4, 0, 4, 0">
                         <Label Text="Medium" HorizontalOptions="Center" VerticalOptions="Center"/>
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="selectDifficulty"/>
+                            <TapGestureRecognizer Tapped="SelectDifficulty"/>
                         </Border.GestureRecognizers>
                     </Border>
-                    <Border BackgroundColor="Purple" Stroke="Black" Margin="4, 0, 0, 0">
+                    <Border x:Name="DifficultyHard" BackgroundColor="Purple" Stroke="Black" Margin="4, 0, 0, 0">
                         <Label Text="Hard" HorizontalOptions="Center" VerticalOptions="Center"/>
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="selectDifficulty"/>
+                            <TapGestureRecognizer Tapped="SelectDifficulty"/>
                         </Border.GestureRecognizers>
                     </Border>
                 </HorizontalStackLayout>
@@ -43,7 +43,7 @@
                     
                 </Grid>
 
-                <Button Text="Generate" Clicked="automaticCreateCode" />
+                <Button Text="Generate" Clicked="AutomaticCreateCode" />
             </VerticalStackLayout>
         </AbsoluteLayout>
 
