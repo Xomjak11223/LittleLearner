@@ -1,6 +1,3 @@
 <Solution>
-  <Project Path="ImportCFG/CfgCompLib.csproj" />
-  <Project Path="LimitCGenerator/LimitCGenerator.csproj" />
-  <Project Path="LimitCInterpreter/LimitCInterpreter.csproj" />
   <Project Path="LittleLearner/LittleLearner.csproj" />
 </Solution>
