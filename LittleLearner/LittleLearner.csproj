@@ -62,6 +62,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\CfgComparer\ImportCFG\CfgCompLib.csproj" />
+	  <ProjectReference Include="..\LimitCSolver\LimitCGenerator\LimitCGenerator.csproj" />
+	  <ProjectReference Include="..\LimitCSolver\LimitCInterpreter\LimitCInterpreter.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <MauiXaml Update="CFG\CfgComparer.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
