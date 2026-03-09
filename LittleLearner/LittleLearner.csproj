@@ -68,7 +68,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Tabs\CfgComparer.xaml">
+	  <MauiXaml Update="CFG\CfgComparer.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Tabs\LimitCSolver.xaml">
