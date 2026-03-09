@@ -7,6 +7,9 @@ namespace LittleLearner.CFG
 {
     internal class FlowchartDrawer : IDrawable
     {
+        public static float offsetX = 0;
+        public static float offsetY = 0;
+        private float zoom = 1;
         private readonly Color Background = new Color(0, 60, 100);
         public static Graph graph = null;
         public void Draw(ICanvas canvas, RectF dirtyRect)
@@ -18,16 +21,24 @@ namespace LittleLearner.CFG
 
             foreach(var nodeIndexPair in graph.GetNodes()) {
                 ShapeProperties shape = nodeIndexPair.Value.Shape;
-             
+                float x = shape.x + offsetX;
+                float y = shape.y + offsetY;
+
+                // Check if shape is out of drawable area
+                if (x > dirtyRect.Width) { continue; }
+                if (x + shape.width < 0) { continue; }
+
+                if (y > dirtyRect.Height) { continue; }
+                if (y + shape.height < 0) { continue; }
+
                 switch (shape.shape) {
-                    case Shape.Start: drawStart(canvas, shape.x, shape.y, shape.width, shape.height); break;
-                    case Shape.End: drawEnd(canvas, shape.x, shape.y, shape.width, shape.height); break;
-                    case Shape.Action: drawAction(canvas, "myText", shape.x, shape.y, shape.width, shape.height); break;
-                    case Shape.Decision: drawDecision(canvas, "myText", shape.x, shape.y, shape.width, shape.height); break;
+                    case Shape.Start: drawStart(canvas, x, y, shape.width, shape.height); break;
+                    case Shape.End: drawEnd(canvas, x, y, shape.width, shape.height); break;
+                    case Shape.Action: drawAction(canvas, "myText", x, y, shape.width, shape.height); break;
+                    case Shape.Decision: drawDecision(canvas, "myText", x, y, shape.width, shape.height); break;
                 }
             }
         }
-
         public void drawStart(ICanvas canvas, float startX, float startY, float width, float height)
         {
             // canvas.DrawText("Start", startX, startY, width, height);
@@ -50,8 +61,6 @@ namespace LittleLearner.CFG
         {
         }
 
-        public void moveCameraLeft() { }
-        public void moveCameraRight() { }
         public void zoomIn() { }
         public void zoomOut() { }
     }
