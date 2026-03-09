@@ -38,15 +38,33 @@ namespace CfgCompLib {
 
             foreach (XmlElement vertex in vertices) {  
                 idMapping.Add(vertex.GetAttribute("id"), graphId);  //provide new IDs for nodes
+<<<<<<< HEAD
                 graph.AddNode(new(graphId, PrepareLabel(vertex.GetAttribute("value")))); //get label content
                 graphId++;   
+=======
+
+                // Extracts the Node Position and Size properties
+                int x = int.Parse(Regex.Match(vertex.InnerXml, @"x\s?=\s?""(\d+)""").Groups[1].Value);
+                int y = int.Parse(Regex.Match(vertex.InnerXml, @"y\s?=\s?""(\d+)""").Groups[1].Value);
+                int width = int.Parse(Regex.Match(vertex.InnerXml, @"width\s?=\s?""(\d+)""").Groups[1].Value);
+                int height = int.Parse(Regex.Match(vertex.InnerXml, @"height\s?=\s?""(\d+)""").Groups[1].Value);
+
+                // Extracts the 
+
+                graph.AddNode(new Node(graphId, PrepareLabel(vertex.GetAttribute("value")), null, null, new ShapeProperties(x, y, width, height, Shape.Start))); //get label content
+                graphId++;
+>>>>>>> master
             };
 
             foreach (XmlElement edge in edges) {
                 try { 
 
                 int sourceId = idMapping[edge.GetAttribute("source")]; //create graph edges
+<<<<<<< HEAD
                 int targetId = idMapping[edge.GetAttribute("target")]; //by attributes "source" + "target"      
+=======
+                int targetId = idMapping[edge.GetAttribute("target")]; //by attributes "source" + "target"
+>>>>>>> master
                 graph.AddEdge(graph.GetNode(sourceId), graph.GetNode(targetId));
 
                 } catch (KeyNotFoundException ex){   

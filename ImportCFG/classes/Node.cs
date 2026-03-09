@@ -25,8 +25,17 @@ public class Node : IComparable<Node> {     //IComparable just to allow internal
     [DataMember(Order = 6)]
     private List<Node> Successors = [];
 
+<<<<<<< HEAD
     public Node(int id, List<string> label = null, List<Node> predecessors = null, List<Node> successors = null) {
         Id = id;
+=======
+    [DataMember(Order = 7)]
+    public ShapeProperties shapeProperties { get; set; }
+
+    public Node(int id, List<string> label = null, List<Node> predecessors = null, List<Node> successors = null, ShapeProperties shapeProperties = null) {
+        Id = id;
+        this.shapeProperties = shapeProperties;
+>>>>>>> master
         if (label != null) Label = label;
         predecessors?.ForEach(predec => AddPredecessor(predec));
         successors?.ForEach(succs => AddSuccessor(succs));
