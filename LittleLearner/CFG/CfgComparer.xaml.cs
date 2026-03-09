@@ -1,8 +1,7 @@
 using CfgCompLib;
 using CfgCompLib.classes;
-using LittleLearner.CFG;
 
-namespace LittleLearner.Tabs;
+namespace LittleLearner.CFG;
 
 public partial class CfgComparer : ContentPage
 {

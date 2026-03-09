@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:fc="clr-namespace:LittleLearner.CFG"
-             x:Class="LittleLearner.Tabs.CfgComparer">
+             x:Class="LittleLearner.CFG.CfgComparer">
 
     
     <ContentPage.Resources>
@@ -21,24 +21,7 @@
     </ContentPage.MenuBarItems>
 
     <Grid ColumnDefinitions="*, *">
-        <WebView Grid.Column="0">
-            <WebView.Source>
-                <HtmlWebViewSource>
-                    <HtmlWebViewSource.Html>
-                        <![CDATA[
-                <HTML>
-                <BODY>
-                <H1>.NET MAUI</H1>
-                <P>Welcome to WebView.</P>
-                </BODY>
-                </HTML>
-                ]]>
-                    </HtmlWebViewSource.Html>
-                </HtmlWebViewSource>
-            </WebView.Source>
-        </WebView>
-        
-        <!--Editor BackgroundColor="#003C64" Grid.Column="0" /-->
+        <Editor BackgroundColor="#003C64" Grid.Column="0" />
 
         <Grid Grid.Column="1" RowDefinitions="*, Auto">
             <GraphicsView Drawable="{StaticResource flowchart}" x:Name="FlowchartView" Grid.Row="0" BackgroundColor="#003C64" />

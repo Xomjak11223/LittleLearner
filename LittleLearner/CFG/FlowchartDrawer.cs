@@ -14,11 +14,11 @@ namespace LittleLearner.CFG
         public static Graph graph = null;
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
-            if(graph == null) { return; }
 
             canvas.FillColor = Background;
             canvas.FillRectangle(dirtyRect);
 
+            if(graph == null) { return; }
             foreach(var nodeIndexPair in graph.GetNodes()) {
                 ShapeProperties shape = nodeIndexPair.Value.Shape;
                 float x = shape.x + offsetX;
@@ -63,5 +63,10 @@ namespace LittleLearner.CFG
 
         public void zoomIn() { }
         public void zoomOut() { }
+
+        public static void cleanCanvase()
+        {
+
+        }
     }
 }
