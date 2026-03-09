@@ -1,3 +1,6 @@
+[submodule "CfgComparer"]
+	path = CfgComparer
+	url = https://github.com/HOME-programming-pub/CfgComparer
 [submodule "LimitCSolver"]
 	path = LimitCSolver
 	url = https://github.com/HOME-programming-pub/LimitCSolver
