@@ -14,7 +14,7 @@ namespace LittleLearner.CFG.StateLogic
             this.graphicsView = graphicsView;
         }
 
-        public abstract void OnFlowchartPressed(object sender, TouchEventArgs eventArgs);
-        public abstract void OnFlowchartDragged(object sender, TouchEventArgs eventArgs);
+        public abstract void OnFlowchartPressed(object? sender, TouchEventArgs eventArgs);
+        public abstract void OnFlowchartDragged(object? sender, TouchEventArgs eventArgs);
     }
 }

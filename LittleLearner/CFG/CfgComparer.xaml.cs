@@ -6,17 +6,6 @@ namespace LittleLearner.CFG;
 
 public partial class CfgComparer : ContentPage
 {
-    private Shape selectedShape = Shape.Action;
-    private float GraphicsViewOffsetY = 0;
-	private float GraphicsViewOffsetX = 0;
-
-    private float UserTouchX = 0;
-    private float UserTouchY = 0;
-
-    private readonly float standartWidth = 100;
-    private readonly float standartHeight = 100;
-
-    private Boolean shapeSelected = false;
     public Shape SelectedShape = Shape.Start;
     public State state;
     public FlowchartDrawer flowchartDrawer;
@@ -27,11 +16,9 @@ public partial class CfgComparer : ContentPage
 
         flowchartDrawer = new FlowchartDrawer();
         Resources["flowchart"] = flowchartDrawer;
-        state = new MoveFlowchartState(fl);
+        state = new MoveFlowchartState(flowchartDrawer, FlowchartView);
 
         // Declares Functionality for the Flowgraph to be moved by dragging the Pointer across the drawable area
-        FlowchartView.StartInteraction += OnFlowchartPressed;
-        FlowchartView.DragInteraction += OnFlowchartDragged;
         FlowchartView.Invalidate();
     }
 

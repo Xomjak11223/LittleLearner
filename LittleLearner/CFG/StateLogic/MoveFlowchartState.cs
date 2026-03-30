@@ -12,9 +12,13 @@ namespace LittleLearner.CFG.StateLogic
         private float UserTouchX = 0;
         private float UserTouchY = 0;
 
-        public MoveFlowchartState(FlowchartDrawer flowchartDrawer, GraphicsView graphicsView) : base(flowchartDrawer, graphicsView) {}
+        public MoveFlowchartState(FlowchartDrawer flowchartDrawer, GraphicsView graphicsView) : base(flowchartDrawer, graphicsView) 
+        {
+            graphicsView.StartInteraction += OnFlowchartPressed;
+            graphicsView.DragInteraction += OnFlowchartDragged;
+        }
 
-        public override void OnFlowchartDragged(object sender, TouchEventArgs eventArgs)
+        public override void OnFlowchartDragged(object? sender, TouchEventArgs eventArgs)
         {
             if (flowchartDrawer.graph == null) { return; }
 
@@ -26,7 +30,7 @@ namespace LittleLearner.CFG.StateLogic
             graphicsView.Invalidate();
         }
 
-        public override void OnFlowchartPressed(object sender, TouchEventArgs eventArgs)
+        public override void OnFlowchartPressed(object? sender, TouchEventArgs eventArgs)
         {
             if (flowchartDrawer.graph == null) { return; }
 

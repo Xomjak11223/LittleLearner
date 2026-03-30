@@ -3,6 +3,7 @@ using Microsoft.Maui.Graphics.Text;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LittleLearner.CFG
 {
@@ -36,44 +37,56 @@ namespace LittleLearner.CFG
                 ShapeProperties shape = nodeIndexPair.Value.Shape;
                 float x = shape.x + offsetX;
                 float y = shape.y + offsetY;
+                bool shapeNotInDirtyRect = (x > dirtyRect.Width) || (x + shape.width < 0) || (y > dirtyRect.Height) || (y + shape.height < 0);
+
+                // Draws the connection to its succesor shape
+                foreach (Node child in nodeIndexPair.Value.GetSuccessors())
+                {
+                    float childX = child.Shape.x + offsetX;
+                    float childY = child.Shape.y + offsetY;
+                    bool childNotInDirtyRect = (childX > dirtyRect.Width) || (childX + shape.width < 0) || (childY > dirtyRect.Height) || (childY + shape.height < 0);
+
+                    if(!shapeNotInDirtyRect || !childNotInDirtyRect) { connectShapes(canvas, x, y, childX, childY); }
+                }
 
                 // Check if shape is out of drawable area
-                if (x > dirtyRect.Width) { continue; }
-                if (x + shape.width < 0) { continue; }
+                if (shapeNotInDirtyRect) { continue; }
 
-                if (y > dirtyRect.Height) { continue; }
-                if (y + shape.height < 0) { continue; }
+                var labels = nodeIndexPair.Value.GetLabel();
+                string label = "NO LABEL";
+                if (labels != null)
+                {
+                    if(labels.Count != 0) label = labels[0];
+                }
 
+                // Draws the Flow Graph Shape
                 switch (shape.shape) {
                     case Shape.Start: drawStart(canvas, x, y, shape.width, shape.height); break;
                     case Shape.End: drawEnd(canvas, x, y, shape.width, shape.height); break;
-                    case Shape.Action: drawAction(canvas, "myText", x, y, shape.width, shape.height); break;
-                    case Shape.Decision: drawDecision(canvas, "myText", x, y, shape.width, shape.height); break;
+                    case Shape.Action: drawAction(canvas, label, x, y, shape.width, shape.height); break;
+                    case Shape.Decision: drawDecision(canvas, label, x, y, shape.width, shape.height); break;
                 }
-
-                //drawDecision(canvas, "myText", x, y, shape.width, shape.height);
             }
 
             // Draws the connection between the shapes
         }
         public void drawStart(ICanvas canvas, float startX, float startY, float width, float height)
         {
-            // canvas.DrawText("Start", startX, startY, width, height);
-            //IAttributedText text = new;
-            // AttributedText text = new AttributedText()
-
             canvas.DrawRoundedRectangle(startX, startY, width, height, 4);
-            //canvas.DrawText("text", startX, startY, width, height);
+            drawText(canvas, "Start", startX, startY, width, height);
         }
 
         public void drawEnd(ICanvas canvas, float startX, float startY, float width, float height)
         {
+            canvas.DrawRoundedRectangle(startX, startY, width, height, 4);
+            drawText(canvas, "End", startX, startY, width, height);
         }
 
         // startX and startY defines the upper left Corner of the bounding box of the rombus
         public void drawAction(ICanvas canvas, String text, float startX, float startY, float width, float height)
         {
-            
+            canvas.DrawRectangle(startX, startY, width, height);
+            drawText(canvas, text, startX, startY, width, height);
         }
 
         public void drawDecision(ICanvas canvas, String text, float startX, float startY, float width, float height)
@@ -81,17 +94,29 @@ namespace LittleLearner.CFG
             float widthHalf = width / 2;
             float heightHalf = height / 2;
 
+            // Draws the Decision field
             PathF pathRombus = new PathF(startX, startY + heightHalf);  // Starts at left corner of rombus
-            pathRombus.MoveTo(startX + widthHalf, startY);  // Moves to upper Corner of rombus
-            pathRombus.MoveTo(startX + width, startY + heightHalf); // Moves to right Corner of rombus
-            pathRombus.MoveTo(startX + widthHalf, startY + height); // Moves to lower Corner of rombus
-            pathRombus.MoveTo(startX, startY + heightHalf); // Moves to left Corner of rombus
+            pathRombus.LineTo(startX + widthHalf, startY);  // Moves to top Corner
+            pathRombus.LineTo(startX + width, startY + heightHalf); // Moves to right Corner
+            pathRombus.LineTo(startX + widthHalf, startY + height); // Moves to bottom Corner
+            pathRombus.LineTo(startX, startY + heightHalf); // Moves to left Corner
+            pathRombus.Close();
 
             canvas.DrawPath(pathRombus);
+            drawText(canvas, text, startX, startY, width, height);
         }
 
-        public void connectShapes(ICanvas canvas)
+        public void drawText(ICanvas canvas, String text, float startX, float startY, float width, float height)
         {
+            RectF textBounds = new RectF(startX, startY, width, height);
+
+            canvas.FontSize = 16;
+            canvas.DrawString(text, textBounds, HorizontalAlignment.Center, VerticalAlignment.Center);
+        }
+
+        public void connectShapes(ICanvas canvas, float startX, float startY, float endX, float endY)
+        {
+            canvas.DrawLine(startX, startY, endX, endY);
         }
 
         public void zoomIn() { }
