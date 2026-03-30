@@ -1,5 +1,6 @@
 using CfgCompLib;
 using CfgCompLib.classes;
+using LittleLearner.CFG.StateLogic;
 
 namespace LittleLearner.CFG;
 
@@ -12,39 +13,32 @@ public partial class CfgComparer : ContentPage
     private float UserTouchX = 0;
     private float UserTouchY = 0;
 
+    private readonly float standartWidth = 100;
+    private readonly float standartHeight = 100;
+
+    private Boolean shapeSelected = false;
+    public Shape SelectedShape = Shape.Start;
+    public State state;
+    public FlowchartDrawer flowchartDrawer;
+
     public CfgComparer()
 	{
         InitializeComponent();
+
+        flowchartDrawer = new FlowchartDrawer();
+        Resources["flowchart"] = flowchartDrawer;
+        state = new MoveFlowchartState(fl);
+
         // Declares Functionality for the Flowgraph to be moved by dragging the Pointer across the drawable area
         FlowchartView.StartInteraction += OnFlowchartPressed;
         FlowchartView.DragInteraction += OnFlowchartDragged;
+        FlowchartView.Invalidate();
     }
 
     // Saves the Point, where the user touched the drawable area to calculate the direction and distance of movement
-	private void OnFlowchartPressed(object sender, TouchEventArgs eventArgs)
-	{
-		if(FlowchartDrawer.graph == null) { return; }
-
-		UserTouchX = eventArgs.Touches.FirstOrDefault().X;
-        UserTouchY = eventArgs.Touches.FirstOrDefault().Y;
-
-        GraphicsViewOffsetX = FlowchartDrawer.offsetX;
-        GraphicsViewOffsetY = FlowchartDrawer.offsetY;
-    }
 
     // Calculates the direction and distance the user moved the Pointer after touching the drawable area
     // Moves the drawable objects accordingly
-    private void OnFlowchartDragged(object sender, TouchEventArgs eventArgs)
-	{
-        if (FlowchartDrawer.graph == null) { return; }
-
-        float dx = eventArgs.Touches.FirstOrDefault().X - UserTouchX;
-        float dy = eventArgs.Touches.FirstOrDefault().Y - UserTouchY;
-
-        FlowchartDrawer.offsetX = GraphicsViewOffsetX + dx;
-        FlowchartDrawer.offsetY = GraphicsViewOffsetY + dy;
-        FlowchartView.Invalidate();
-    }
 
     private void ImportCProgram(object sender, EventArgs args)
     {
@@ -59,7 +53,7 @@ public partial class CfgComparer : ContentPage
         FileResult? file = await FilePicker.Default.PickAsync();
         if (file == null) { return; }
 
-        FlowchartDrawer.graph = CfgFromFlowChart.GenerateGraphFromXML(file.FullPath);
+        flowchartDrawer.graph = CfgFromFlowChart.GenerateGraphFromXML(file.FullPath);
 
         FlowchartView.Invalidate();
     }
@@ -67,5 +61,27 @@ public partial class CfgComparer : ContentPage
     {
         return;
     }
+
+    private void addNode(float x, float y) {
+        
+    }
+
+    private void temporaryStart(object sender, EventArgs args)
+    {
+
+    }
+    private void temporaryEnd(object sender, EventArgs args)
+    {
+
+    }
+    private void temporaryAction(object sender, EventArgs args)
+    {
+
+    }
+    private void temporaryDecision(object sender, EventArgs args)
+    {
+
+    }
+
 
 }
