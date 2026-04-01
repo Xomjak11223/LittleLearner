@@ -1,11 +1,16 @@
 using CfgCompLib;
 using CfgCompLib.classes;
+using ColorfulCode;
 using LittleLearner.CFG.StateLogic;
+using LittleLearner.SyntaxHighlighting;
+using System.Text.RegularExpressions;
+using System.Web;
 
 namespace LittleLearner.CFG;
 
 public partial class CfgComparer : ContentPage
 {
+    TextHighlighter highlighter = new TextHighlighter();
     public Shape SelectedShape = Shape.Start;
     public State state;
     public FlowchartDrawer flowchartDrawer;
@@ -13,6 +18,8 @@ public partial class CfgComparer : ContentPage
     public CfgComparer()
 	{
         InitializeComponent();
+
+        CodeSection.Html = highlighter.initializeCodeHighligher("int main(){ \n char a[] = \"<Hallo><Welt>\"\nreturn 0; }\n\nint");
 
         flowchartDrawer = new FlowchartDrawer();
         Resources["flowchart"] = flowchartDrawer;
@@ -70,5 +77,15 @@ public partial class CfgComparer : ContentPage
 
     }
 
+    private async void CodeWritten(object? sender, WebNavigatingEventArgs navigationArgs)
+    {
+        string[] queryParams = navigationArgs.Url.Split("?");
+        if (queryParams.Length != 2) return;
 
+        string newCode = HttpUtility.UrlDecode(new Regex("^newCode=").Replace(queryParams[1], ""));
+        string coloredCode = highlighter.updateCode(newCode);
+        navigationArgs.Cancel = true;
+
+        await CodeWebView.EvaluateJavaScriptAsync($"setInnerText('{coloredCode}')");
+    }
 }

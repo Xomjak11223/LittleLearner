@@ -21,7 +21,12 @@
     </ContentPage.MenuBarItems>
 
     <Grid ColumnDefinitions="*, *">
-        <Editor BackgroundColor="#003C64" Grid.Column="0" />
+        <!-- Editor BackgroundColor="#003C64" Grid.Column="0" /-->
+        <WebView Grid.Column="0" x:Name="CodeWebView" Navigating="CodeWritten">
+            <WebView.Source>
+                <HtmlWebViewSource x:Name="CodeSection" Html="&lt;span style='font-weight:bold;color:#a71d5d;'&gt;int&lt;/span&gt;" />
+            </WebView.Source>
+        </WebView>
 
         <Grid Grid.Column="1" RowDefinitions="Auto, *, Auto">
             <HorizontalStackLayout Grid.Row="0" BackgroundColor="DarkGrey">

@@ -76,4 +76,8 @@
 	  </MauiXaml>
 	</ItemGroup>
 
+	<ItemGroup>
+		<PackageReference Include="ColorfulCode" Version="1.0.0-preview1" />
+	</ItemGroup>
+
 </Project>
