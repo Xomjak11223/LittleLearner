@@ -10,6 +10,7 @@ namespace LittleLearner.CFG.StateLogic
         private float boundStartY;
         private float boundEndX;
         private float boundEndY;
+        private bool moveSelected;
 
         public SelectState(FlowchartDrawer flowchartDrawer, GraphicsView graphicsView) : base(flowchartDrawer, graphicsView)
         {
@@ -21,8 +22,11 @@ namespace LittleLearner.CFG.StateLogic
         public override void OnFlowchartPressed(object? sender, TouchEventArgs eventArgs)
         {
             if (flowchartDrawer.graph == null) { return; }
+
             boundStartX = eventArgs.Touches.FirstOrDefault().X;
             boundStartY = eventArgs.Touches.FirstOrDefault().Y;
+
+            moveSelected = flowchartDrawer.pointOnSelected(boundStartX, boundStartY);
         }
 
         public override void OnFlowchartDragged(object? sender, TouchEventArgs eventArgs)
@@ -31,7 +35,16 @@ namespace LittleLearner.CFG.StateLogic
             boundEndX = eventArgs.Touches.FirstOrDefault().X;
             boundEndY = eventArgs.Touches.FirstOrDefault().Y;
 
-            flowchartDrawer.drawSelectionArea(boundStartX, boundStartY, boundEndX, boundEndY);
+            if (moveSelected)
+            {
+                flowchartDrawer.moveSelected(boundEndX - boundStartX, boundEndY - boundStartY);
+                boundStartX = boundEndX;
+                boundStartY = boundEndY;
+            }
+            else
+            {
+                flowchartDrawer.drawSelectionArea(boundStartX, boundStartY, boundEndX, boundEndY);
+            }
             graphicsView.Invalidate();
         }
 

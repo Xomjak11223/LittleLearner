@@ -81,6 +81,7 @@ namespace LittleLearner.CFG
             }
 
             // Draws the selection Box if needed
+            // ERROR when drawing selection box around shape it sometimes does not draw
             if (drawSelectionBox && tempNode != null)
             {
                 float x = tempNode.Shape.x + offsetX;
@@ -227,5 +228,31 @@ namespace LittleLearner.CFG
         }
 
         public void hideSelectionArea() { this.drawSelectionBox = false; tempNode = null; }
+
+        public bool pointOnSelected(float x, float y)
+        {
+            if(graph == null) { return false; }
+
+            foreach(var nodeIndexPair in graph.GetNodes())
+            {
+                ShapeProperties shape = nodeIndexPair.Value.Shape;
+                if (x >= shape.x && x <= (shape.x + shape.width) && y >= shape.y && y < (shape.y + shape.width)) { return true; }
+            }
+
+            return false;
+        }
+
+        public void moveSelected(float dx, float dy)
+        {
+            foreach (var nodeIndexPair in graph.GetNodes())
+            {
+                ShapeProperties shape = nodeIndexPair.Value.Shape;
+                if (shape.selected) 
+                {
+                    nodeIndexPair.Value.Shape.x += dx;
+                    nodeIndexPair.Value.Shape.y += dy;
+                }
+            }
+        }
     }
 }
