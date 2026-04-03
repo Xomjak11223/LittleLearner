@@ -23,7 +23,7 @@ public partial class CfgComparer : ContentPage
 
         flowchartDrawer = new FlowchartDrawer();
         Resources["flowchart"] = flowchartDrawer;
-        state = new MoveFlowchartState(flowchartDrawer, FlowchartView);
+        state = new SelectState(flowchartDrawer, FlowchartView);
 
         // Declares Functionality for the Flowgraph to be moved by dragging the Pointer across the drawable area
         FlowchartView.Invalidate();

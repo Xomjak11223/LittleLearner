@@ -3,33 +3,34 @@ using Microsoft.Maui.Graphics.Text;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using static Antlr4.Runtime.Atn.SemanticContext;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace LittleLearner.CFG
 {
     public class FlowchartDrawer : IDrawable
     {
+        private bool drawSelectionBox = false;
         public float offsetX = 0;
         public float offsetY = 0;
-        public Node tempNode = null;
+        public Node? tempNode = null;
         private float zoom = 1;
         private readonly Color Background = new Color(0, 60, 100);
+
+        private readonly Color SelectedBorderColor = new Color(0, 0, 255);
+        private readonly Color SelectedFillColor = new Color(0, 0, 100);
+
+        private readonly Color SelectoinBoxBorderColor = new Color(255, 0, 0);
+        private readonly Color SelectoinBoxFillColor = new Color(100, 0, 0);
+
+        private readonly Color DefaultBorderColor = new Color(0, 0, 0);
+        private readonly Color DefaultFillColor = new Color(255, 255, 255);
+
         public Graph graph = null;
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
             canvas.FillColor = Background;
             canvas.FillRectangle(dirtyRect);
-
-            if(tempNode != null)
-            {
-                switch (tempNode.Shape.shape)
-                {
-                    case Shape.Start: drawStart(canvas, tempNode.Shape.x, tempNode.Shape.y, tempNode.Shape.width, tempNode.Shape.height); break;
-                    case Shape.End: drawEnd(canvas, tempNode.Shape.x, tempNode.Shape.y, tempNode.Shape.width, tempNode.Shape.height); break;
-                    case Shape.Action: drawAction(canvas, "myText", tempNode.Shape.x, tempNode.Shape.y, tempNode.Shape.width, tempNode.Shape.height); break;
-                    case Shape.Decision: drawDecision(canvas, "myText", tempNode.Shape.x, tempNode.Shape.y, tempNode.Shape.width, tempNode.Shape.height); break;
-                }
-            }
 
             if (graph == null) { return; }
             // Draws every single Shape
@@ -46,7 +47,7 @@ namespace LittleLearner.CFG
                     float childY = child.Shape.y + offsetY;
                     bool childNotInDirtyRect = (childX > dirtyRect.Width) || (childX + shape.width < 0) || (childY > dirtyRect.Height) || (childY + shape.height < 0);
 
-                    if(!shapeNotInDirtyRect || !childNotInDirtyRect) { connectShapes(canvas, x, y, childX, childY); }
+                    if(!shapeNotInDirtyRect || !childNotInDirtyRect) { connectShapes(canvas, x, y, shape.width, shape.height, childX, childY, child.Shape.width, child.Shape.height); }
                 }
 
                 // Check if shape is out of drawable area
@@ -59,6 +60,17 @@ namespace LittleLearner.CFG
                     if(labels.Count != 0) label = labels[0];
                 }
 
+                if (shape.selected) 
+                {
+                    canvas.StrokeColor = SelectedBorderColor;
+                    canvas.FillColor = SelectedFillColor;
+                }
+                else 
+                {
+                    canvas.StrokeColor = DefaultBorderColor;
+                    canvas.FillColor = DefaultFillColor;
+                }
+
                 // Draws the Flow Graph Shape
                 switch (shape.shape) {
                     case Shape.Start: drawStart(canvas, x, y, shape.width, shape.height); break;
@@ -68,7 +80,28 @@ namespace LittleLearner.CFG
                 }
             }
 
-            // Draws the connection between the shapes
+            // Draws the selection Box if needed
+            if (drawSelectionBox && tempNode != null)
+            {
+                float x = tempNode.Shape.x + offsetX;
+                float y = tempNode.Shape.y + offsetY;
+
+                canvas.StrokeColor = SelectoinBoxBorderColor;
+                canvas.FillColor = SelectoinBoxFillColor;
+                canvas.DrawRectangle(x, y, tempNode.Shape.width, tempNode.Shape.height);
+            }
+
+            // Draws the Node that the User wants to currently create
+            if (false && tempNode != null)
+            {
+                switch (tempNode.Shape.shape)
+                {
+                    case Shape.Start: drawStart(canvas, tempNode.Shape.x, tempNode.Shape.y, tempNode.Shape.width, tempNode.Shape.height); break;
+                    case Shape.End: drawEnd(canvas, tempNode.Shape.x, tempNode.Shape.y, tempNode.Shape.width, tempNode.Shape.height); break;
+                    case Shape.Action: drawAction(canvas, "myText", tempNode.Shape.x, tempNode.Shape.y, tempNode.Shape.width, tempNode.Shape.height); break;
+                    case Shape.Decision: drawDecision(canvas, "myText", tempNode.Shape.x, tempNode.Shape.y, tempNode.Shape.width, tempNode.Shape.height); break;
+                }
+            }
         }
         public void drawStart(ICanvas canvas, float startX, float startY, float width, float height)
         {
@@ -114,9 +147,15 @@ namespace LittleLearner.CFG
             canvas.DrawString(text, textBounds, HorizontalAlignment.Center, VerticalAlignment.Center);
         }
 
-        public void connectShapes(ICanvas canvas, float startX, float startY, float endX, float endY)
+        public void connectShapes(ICanvas canvas, float startX, float startY, float startWidth, float startHeight, float endX, float endY, float endWidth, float endHeight)
         {
-            canvas.DrawLine(startX, startY, endX, endY);
+            float startCenterX = startX + (startWidth / 2);
+            float startCenterY = startY + (startHeight / 2);
+            float endCenterX = endX + (endWidth / 2);
+            float endCenterY = endY + (endHeight / 2);
+
+            canvas.DrawLine(startCenterX, startCenterY, endCenterX, startCenterY);
+            canvas.DrawLine(endCenterX, startCenterY, endCenterX, endCenterY);
         }
 
         public void zoomIn() { }
@@ -126,5 +165,67 @@ namespace LittleLearner.CFG
         {
             
         }
+
+        public void selectShapesInArea(float startX, float startY, float endX, float endY)
+        {
+            if (graph == null) return;
+
+            // Translates selection, such that
+            // (startX, startY) is the upper left corner and
+            // (endX, endY) is the lower right corner
+            if(startX > endX)
+            {
+                float temp = startX;
+                startX = endX;
+                endX = temp;
+            }
+
+            if (startY > endY)
+            {
+                float temp = startY;
+                startY = endY;
+                endY = temp;
+            }
+
+            foreach (var nodeIndexPair in graph.GetNodes())
+            {
+                ShapeProperties shape = nodeIndexPair.Value.Shape;
+
+                // Case 1: Rectangle is partially in selection
+                if (startX <= (shape.x + shape.width) && endX >= shape.x && startY <= (shape.y + shape.height) && endY >= shape.y)
+                {
+                    nodeIndexPair.Value.Shape.selected = true;
+                    continue;
+                }
+
+                // Case 2: Rectangle is completely inside selection
+                if(shape.x >= startX && (shape.x + shape.width) <= endX && shape.y >= startY && (shape.y + shape.height) <= endY)
+                {
+                    nodeIndexPair.Value.Shape.selected = true;
+                    continue;
+                }
+
+                // Case 3: Rectangle surrounds selection
+                if (startX >= shape.x && endX <= (shape.x + shape.width) && startY >= shape.y && endY <= (shape.y + shape.height))
+                {
+                    nodeIndexPair.Value.Shape.selected = true;
+                    continue;
+                }
+
+                nodeIndexPair.Value.Shape.selected = false;
+            }
+        }
+
+        public void drawSelectionArea(float startX, float startY, float endX, float endY)
+        {
+            float width = (endX == startX) ? ((float) 0.1) : (endX - startX);
+            float height = (endY == startY) ? ((float)0.1) : (endY - startY);
+
+            // Shape as a property is irrelevant, chose Shape.Action as filler
+            tempNode = new Node(0, null, null, null, new ShapeProperties(startX, startY, width, height, Shape.Action));
+            drawSelectionBox = true;
+        }
+
+        public void hideSelectionArea() { this.drawSelectionBox = false; tempNode = null; }
     }
 }
