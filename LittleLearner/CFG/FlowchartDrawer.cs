@@ -84,8 +84,8 @@ namespace LittleLearner.CFG
             // ERROR when drawing selection box around shape it sometimes does not draw
             if (drawSelectionBox && tempNode != null)
             {
-                float x = tempNode.Shape.x + offsetX;
-                float y = tempNode.Shape.y + offsetY;
+                float x = tempNode.Shape.x;
+                float y = tempNode.Shape.y;
 
                 canvas.StrokeColor = SelectoinBoxBorderColor;
                 canvas.FillColor = SelectoinBoxFillColor;
@@ -192,22 +192,26 @@ namespace LittleLearner.CFG
             {
                 ShapeProperties shape = nodeIndexPair.Value.Shape;
 
+                // Adding offset to every shape
+                float shapeX = shape.x + offsetX;
+                float shapeY = shape.y + offsetY;
+
                 // Case 1: Rectangle is partially in selection
-                if (startX <= (shape.x + shape.width) && endX >= shape.x && startY <= (shape.y + shape.height) && endY >= shape.y)
+                if (startX <= (shapeX + shape.width) && endX >= shapeX && startY <= (shapeY + shape.height) && endY >= shapeY)
                 {
                     nodeIndexPair.Value.Shape.selected = true;
                     continue;
                 }
 
                 // Case 2: Rectangle is completely inside selection
-                if(shape.x >= startX && (shape.x + shape.width) <= endX && shape.y >= startY && (shape.y + shape.height) <= endY)
+                if(shapeX >= startX && (shapeX + shape.width) <= endX && shapeY >= startY && (shapeY + shape.height) <= endY)
                 {
                     nodeIndexPair.Value.Shape.selected = true;
                     continue;
                 }
 
                 // Case 3: Rectangle surrounds selection
-                if (startX >= shape.x && endX <= (shape.x + shape.width) && startY >= shape.y && endY <= (shape.y + shape.height))
+                if (startX >= shapeX && endX <= (shapeX + shape.width) && startY >= shapeY && endY <= (shapeY + shape.height))
                 {
                     nodeIndexPair.Value.Shape.selected = true;
                     continue;
@@ -236,7 +240,9 @@ namespace LittleLearner.CFG
             foreach(var nodeIndexPair in graph.GetNodes())
             {
                 ShapeProperties shape = nodeIndexPair.Value.Shape;
-                if (x >= shape.x && x <= (shape.x + shape.width) && y >= shape.y && y < (shape.y + shape.width)) { return true; }
+                float shapeX = shape.x + offsetX;
+                float shapeY = shape.y + offsetY;
+                if (x >= shapeX && x <= (shapeX + shape.width) && y >= shapeY && y < (shapeY + shape.width)) { return true; }
             }
 
             return false;

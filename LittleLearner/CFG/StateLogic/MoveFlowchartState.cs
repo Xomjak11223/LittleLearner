@@ -40,5 +40,11 @@ namespace LittleLearner.CFG.StateLogic
             GraphicsViewOffsetX = flowchartDrawer.offsetX;
             GraphicsViewOffsetY = flowchartDrawer.offsetY;
         }
+
+        public override void ClearEventHandler()
+        {
+            graphicsView.StartInteraction -= OnFlowchartPressed;
+            graphicsView.DragInteraction -= OnFlowchartDragged;
+        }
     }
 }

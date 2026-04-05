@@ -29,11 +29,11 @@
         </WebView>
 
         <Grid Grid.Column="1" RowDefinitions="Auto, *, Auto">
-            <HorizontalStackLayout Grid.Row="0" BackgroundColor="DarkGrey">
-                <Button Text="Start" Clicked="temporaryStart" />
-                <Button Text="End" Clicked="temporaryEnd" />
-                <Button Text="Action" Clicked="temporaryAction" />
-                <Button Text="Decision" Clicked="temporaryDecision" />
+            <HorizontalStackLayout Grid.Row="0" Spacing="8" Padding="2">
+                <Button Text="Move" Clicked="Move" />
+                <Button Text="Scale" Clicked="Scale" />
+                <Button Text="Select" Clicked="Select" />
+                <Button Text="Add" Clicked="Add" />
             </HorizontalStackLayout>
             
             <GraphicsView Drawable="{DynamicResource flowchart}" x:Name="FlowchartView" Grid.Row="1" BackgroundColor="#003C64" />

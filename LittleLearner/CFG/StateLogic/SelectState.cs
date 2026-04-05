@@ -58,5 +58,12 @@ namespace LittleLearner.CFG.StateLogic
             flowchartDrawer.selectShapesInArea(boundStartX, boundStartY, boundEndX, boundEndY);
             graphicsView.Invalidate();
         }
+
+        public override void ClearEventHandler()
+        {
+            graphicsView.StartInteraction -= OnFlowchartPressed;
+            graphicsView.DragInteraction -= OnFlowchartDragged;
+            graphicsView.EndInteraction -= OnFlowchartReleased;
+        }
     }
 }

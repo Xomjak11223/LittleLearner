@@ -16,5 +16,6 @@ namespace LittleLearner.CFG.StateLogic
 
         public abstract void OnFlowchartPressed(object? sender, TouchEventArgs eventArgs);
         public abstract void OnFlowchartDragged(object? sender, TouchEventArgs eventArgs);
+        public abstract void ClearEventHandler();
     }
 }

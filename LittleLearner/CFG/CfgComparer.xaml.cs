@@ -56,26 +56,10 @@ public partial class CfgComparer : ContentPage
         return;
     }
 
-    private void addNode(float x, float y) {
-        
-    }
-
-    private void temporaryStart(object sender, EventArgs args)
-    {
-
-    }
-    private void temporaryEnd(object sender, EventArgs args)
-    {
-
-    }
-    private void temporaryAction(object sender, EventArgs args)
-    {
-
-    }
-    private void temporaryDecision(object sender, EventArgs args)
-    {
-
-    }
+    private void Move(object sender, EventArgs args){ state.ClearEventHandler(); state = new MoveFlowchartState(flowchartDrawer, FlowchartView); }
+    private void Scale(object sender, EventArgs args) { state.ClearEventHandler(); state = new ScaleFlowchartState(flowchartDrawer, FlowchartView); }
+    private void Select(object sender, EventArgs args) { state.ClearEventHandler(); state = new SelectState(flowchartDrawer, FlowchartView); }
+    private void Add(object sender, EventArgs args) { state.ClearEventHandler(); state = new AddElementState(flowchartDrawer, FlowchartView); }
 
     private async void CodeWritten(object? sender, WebNavigatingEventArgs navigationArgs)
     {
