@@ -37,6 +37,7 @@ namespace LittleLearner.CFG.StateLogic
 
             if (moveSelected)
             {
+                //TODO shapes can be moved around but after moving, every shape, exept for the one the mouse is hovering, will be deselected
                 flowchartDrawer.moveSelected(boundEndX - boundStartX, boundEndY - boundStartY);
                 boundStartX = boundEndX;
                 boundStartY = boundEndY;

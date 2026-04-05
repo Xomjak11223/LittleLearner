@@ -13,8 +13,8 @@ namespace LittleLearner.CFG
         private bool drawSelectionBox = false;
         public float offsetX = 0;
         public float offsetY = 0;
+        public float zoom = 1;
         public Node? tempNode = null;
-        private float zoom = 1;
         private readonly Color Background = new Color(0, 60, 100);
 
         private readonly Color SelectedBorderColor = new Color(0, 0, 255);
@@ -26,7 +26,7 @@ namespace LittleLearner.CFG
         private readonly Color DefaultBorderColor = new Color(0, 0, 0);
         private readonly Color DefaultFillColor = new Color(255, 255, 255);
 
-        public Graph graph = null;
+        public Graph? graph = null;
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
             canvas.FillColor = Background;
@@ -36,21 +36,27 @@ namespace LittleLearner.CFG
             // Draws every single Shape
             foreach(var nodeIndexPair in graph.GetNodes()) {
                 ShapeProperties shape = nodeIndexPair.Value.Shape;
-                float x = shape.x + offsetX;
-                float y = shape.y + offsetY;
-                bool shapeNotInDirtyRect = (x > dirtyRect.Width) || (x + shape.width < 0) || (y > dirtyRect.Height) || (y + shape.height < 0);
+                float shapeStartX = zoom*(shape.x + offsetX);
+                float shapeEndX = zoom * (shape.x + shape.width + offsetX);
+                float shapeStartY = zoom * (shape.y + offsetY);
+                float shapeEndY = zoom * (shape.y + shape.height + offsetY);
+
+                bool shapeNotInDirtyRect = (shapeStartX > dirtyRect.Width) || (shapeEndX < 0) || (shapeStartY > dirtyRect.Height) || (shapeEndY < 0);
 
                 // Draws the connection to its succesor shape
+                // TODO Connections need to be shecked in both directions (of the start and end are out of bounds, the connection could still be visible)
                 foreach (Node child in nodeIndexPair.Value.GetSuccessors())
                 {
-                    float childX = child.Shape.x + offsetX;
-                    float childY = child.Shape.y + offsetY;
-                    bool childNotInDirtyRect = (childX > dirtyRect.Width) || (childX + shape.width < 0) || (childY > dirtyRect.Height) || (childY + shape.height < 0);
+                    float childStartX = zoom * (child.Shape.x + offsetX);
+                    float childEndX = zoom * (child.Shape.x + child.Shape.width + offsetX);
+                    float childStartY = zoom * (child.Shape.y + offsetY);
+                    float childEndY = zoom * (child.Shape.y + child.Shape.height + offsetY);
 
-                    if(!shapeNotInDirtyRect || !childNotInDirtyRect) { connectShapes(canvas, x, y, shape.width, shape.height, childX, childY, child.Shape.width, child.Shape.height); }
+                    bool childNotInDirtyRect = (childStartX > dirtyRect.Width) || (childEndX < 0) || (childStartY > dirtyRect.Height) || (childEndY < 0);
+
+                    if(!shapeNotInDirtyRect || !childNotInDirtyRect) { connectShapes(canvas, shapeStartX, shapeStartY, shape.width * zoom, shape.height * zoom, childStartX, childStartY, child.Shape.width * zoom, child.Shape.height * zoom); }
                 }
 
-                // Check if shape is out of drawable area
                 if (shapeNotInDirtyRect) { continue; }
 
                 var labels = nodeIndexPair.Value.GetLabel();
@@ -73,14 +79,15 @@ namespace LittleLearner.CFG
 
                 // Draws the Flow Graph Shape
                 switch (shape.shape) {
-                    case Shape.Start: drawStart(canvas, x, y, shape.width, shape.height); break;
-                    case Shape.End: drawEnd(canvas, x, y, shape.width, shape.height); break;
-                    case Shape.Action: drawAction(canvas, label, x, y, shape.width, shape.height); break;
-                    case Shape.Decision: drawDecision(canvas, label, x, y, shape.width, shape.height); break;
+                    case Shape.Start: drawStart(canvas, shapeStartX, shapeStartY, shape.width * zoom, shape.height * zoom); break;
+                    case Shape.End: drawEnd(canvas, shapeStartX, shapeStartY, shape.width * zoom, shape.height * zoom); break;
+                    case Shape.Action: drawAction(canvas, label, shapeStartX, shapeStartY, shape.width * zoom, shape.height * zoom); break;
+                    case Shape.Decision: drawDecision(canvas, label, shapeStartX, shapeStartY, shape.width * zoom, shape.height * zoom); break;
                 }
             }
 
             // Draws the selection Box if needed
+            // Does not need to be translated, uses absolute koordinates
             // ERROR when drawing selection box around shape it sometimes does not draw
             if (drawSelectionBox && tempNode != null)
             {
@@ -93,6 +100,7 @@ namespace LittleLearner.CFG
             }
 
             // Draws the Node that the User wants to currently create
+            // TODO may need to be translated
             if (false && tempNode != null)
             {
                 switch (tempNode.Shape.shape)
@@ -159,14 +167,6 @@ namespace LittleLearner.CFG
             canvas.DrawLine(endCenterX, startCenterY, endCenterX, endCenterY);
         }
 
-        public void zoomIn() { }
-        public void zoomOut() { }
-
-        public static void cleanCanvase(ICanvas canvas)
-        {
-            
-        }
-
         public void selectShapesInArea(float startX, float startY, float endX, float endY)
         {
             if (graph == null) return;
@@ -193,25 +193,27 @@ namespace LittleLearner.CFG
                 ShapeProperties shape = nodeIndexPair.Value.Shape;
 
                 // Adding offset to every shape
-                float shapeX = shape.x + offsetX;
-                float shapeY = shape.y + offsetY;
+                float shapeStartX = zoom * (shape.x + offsetX);
+                float shapeEndX = zoom * (shape.x + shape.width + offsetX);
+                float shapeStartY = zoom * (shape.y + offsetY);
+                float shapeEndY = zoom * (shape.y + shape.height + offsetY);
 
                 // Case 1: Rectangle is partially in selection
-                if (startX <= (shapeX + shape.width) && endX >= shapeX && startY <= (shapeY + shape.height) && endY >= shapeY)
+                if (startX <= shapeEndX && endX >= shapeStartX && startY <= shapeEndY && endY >= shapeStartY)
                 {
                     nodeIndexPair.Value.Shape.selected = true;
                     continue;
                 }
 
                 // Case 2: Rectangle is completely inside selection
-                if(shapeX >= startX && (shapeX + shape.width) <= endX && shapeY >= startY && (shapeY + shape.height) <= endY)
+                if(shapeStartX >= startX && shapeEndX <= endX && shapeStartY >= startY && shapeEndY <= endY)
                 {
                     nodeIndexPair.Value.Shape.selected = true;
                     continue;
                 }
 
                 // Case 3: Rectangle surrounds selection
-                if (startX >= shapeX && endX <= (shapeX + shape.width) && startY >= shapeY && endY <= (shapeY + shape.height))
+                if (startX >= shapeStartX && endX <= shapeEndX && startY >= shapeStartY && endY <= shapeEndY)
                 {
                     nodeIndexPair.Value.Shape.selected = true;
                     continue;
@@ -240,9 +242,12 @@ namespace LittleLearner.CFG
             foreach(var nodeIndexPair in graph.GetNodes())
             {
                 ShapeProperties shape = nodeIndexPair.Value.Shape;
-                float shapeX = shape.x + offsetX;
-                float shapeY = shape.y + offsetY;
-                if (x >= shapeX && x <= (shapeX + shape.width) && y >= shapeY && y < (shapeY + shape.width)) { return true; }
+                float shapeStartX = zoom * (shape.x + offsetX);
+                float shapeEndX = zoom * (shape.x + shape.width + offsetX);
+                float shapeStartY = zoom * (shape.y + offsetY);
+                float shapeEndY = zoom * (shape.y + shape.height + offsetY);
+
+                if (x >= shapeStartX && x <= shapeEndX && y >= shapeStartY && y < shapeEndY) { return true; }
             }
 
             return false;
@@ -255,8 +260,8 @@ namespace LittleLearner.CFG
                 ShapeProperties shape = nodeIndexPair.Value.Shape;
                 if (shape.selected) 
                 {
-                    nodeIndexPair.Value.Shape.x += dx;
-                    nodeIndexPair.Value.Shape.y += dy;
+                    nodeIndexPair.Value.Shape.x += dx / zoom;
+                    nodeIndexPair.Value.Shape.y += dy / zoom;
                 }
             }
         }

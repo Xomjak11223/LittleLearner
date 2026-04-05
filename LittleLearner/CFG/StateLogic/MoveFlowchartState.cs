@@ -22,8 +22,9 @@ namespace LittleLearner.CFG.StateLogic
         {
             if (flowchartDrawer.graph == null) { return; }
 
-            float dx = eventArgs.Touches.FirstOrDefault().X - UserTouchX;
-            float dy = eventArgs.Touches.FirstOrDefault().Y - UserTouchY;
+            float scaling = flowchartDrawer.zoom;
+            float dx = (eventArgs.Touches.FirstOrDefault().X - UserTouchX) / scaling;
+            float dy = (eventArgs.Touches.FirstOrDefault().Y - UserTouchY) / scaling;
 
             flowchartDrawer.offsetX = GraphicsViewOffsetX + dx;
             flowchartDrawer.offsetY = GraphicsViewOffsetY + dy;
