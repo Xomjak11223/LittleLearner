@@ -21,14 +21,25 @@
     </ContentPage.MenuBarItems>
 
     <Grid ColumnDefinitions="*, *">
-        <Editor BackgroundColor="#003C64" Grid.Column="0" />
+        <!-- Editor BackgroundColor="#003C64" Grid.Column="0" /-->
+        <WebView Grid.Column="0" x:Name="CodeWebView" Navigating="CodeWritten">
+            <WebView.Source>
+                <HtmlWebViewSource x:Name="CodeSection" Html="&lt;span style='font-weight:bold;color:#a71d5d;'&gt;int&lt;/span&gt;" />
+            </WebView.Source>
+        </WebView>
 
-        <Grid Grid.Column="1" RowDefinitions="*, Auto">
-            <GraphicsView Drawable="{StaticResource flowchart}" x:Name="FlowchartView" Grid.Row="0" BackgroundColor="#003C64" />
+        <Grid Grid.Column="1" RowDefinitions="Auto, *, Auto">
+            <HorizontalStackLayout Grid.Row="0" Spacing="8" Padding="2">
+                <Button Text="Move" Clicked="Move" />
+                <Button Text="Scale" Clicked="Scale" />
+                <Button Text="Select" Clicked="Select" />
+                <Button Text="Add" Clicked="Add" />
+            </HorizontalStackLayout>
+            
+            <GraphicsView Drawable="{DynamicResource flowchart}" x:Name="FlowchartView" Grid.Row="1" BackgroundColor="#003C64" />
 
-            <BoxView Grid.Row="1" BackgroundColor="#003C64" />
-            <Button Grid.Row="1" Grid.Column="0" HorizontalOptions="Start" Margin="16, 8, 0, 8" Text="Prüfen"/>
-            <Button Grid.Row="1" Grid.Column="1" HorizontalOptions="End" Margin="0, 8, 16, 8" Text="Lösung"/>
+            <Button Grid.Row="2" Grid.Column="0" HorizontalOptions="Start" Margin="16, 8, 0, 8" Text="Prüfen"/>
+            <Button Grid.Row="2" Grid.Column="1" HorizontalOptions="End" Margin="0, 8, 16, 8" Text="Lösung"/>
         </Grid>
     </Grid>
 </ContentPage>

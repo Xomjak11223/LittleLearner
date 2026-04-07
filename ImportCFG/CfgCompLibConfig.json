@@ -3,9 +3,6 @@
     "CompilerOptimization": "-O1",
     "CompilerDir": "",                                //provide path if GCC-compiler is not in windows env params
     "OutputDir": "",                                  //default: outputs folder in exec path
-<<<<<<< HEAD
-    "XSDPath": ".\\validation\\FlowChart_Own.xsd"  //default: validation folder in lib
-=======
     "XSDPath": ".\\validation\\FlowChart_Drawio.xsd"  //default: validation folder in lib
 >>>>>>> master
     //"XSDPath": ".\\validation\\FlowChart_Own.xsd"

@@ -62,18 +62,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\ImportCFG\CfgCompLib.csproj" />
-	  <ProjectReference Include="..\LimitCGenerator\LimitCGenerator.csproj" />
-	  <ProjectReference Include="..\LimitCInterpreter\LimitCInterpreter.csproj" />
+	  <ProjectReference Include="..\CfgComparer\ImportCFG\CfgCompLib.csproj" />
+	  <ProjectReference Include="..\LimitCSolver\LimitCGenerator\LimitCGenerator.csproj" />
+	  <ProjectReference Include="..\LimitCSolver\LimitCInterpreter\LimitCInterpreter.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Tabs\CfgComparer.xaml">
+	  <MauiXaml Update="CFG\CfgComparer.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Tabs\LimitCSolver.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ColorfulCode" Version="1.0.0-preview1" />
 	</ItemGroup>
 
 </Project>

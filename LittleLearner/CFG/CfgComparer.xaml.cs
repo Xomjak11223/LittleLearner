@@ -1,16 +1,19 @@
 using CfgCompLib;
 using CfgCompLib.classes;
+using ColorfulCode;
+using LittleLearner.CFG.StateLogic;
+using LittleLearner.SyntaxHighlighting;
+using System.Text.RegularExpressions;
+using System.Web;
 
 namespace LittleLearner.CFG;
 
 public partial class CfgComparer : ContentPage
 {
-    private Shape selectedShape = Shape.Action;
-    private float GraphicsViewOffsetY = 0;
-	private float GraphicsViewOffsetX = 0;
-
-    private float UserTouchX = 0;
-    private float UserTouchY = 0;
+    TextHighlighter highlighter = new TextHighlighter();
+    public Shape SelectedShape = Shape.Start;
+    public State state;
+    public FlowchartDrawer flowchartDrawer;
 
     public CfgComparer()
 	{
@@ -20,31 +23,16 @@ public partial class CfgComparer : ContentPage
         FlowchartView.DragInteraction += OnFlowchartDragged;
     }
 
-    // Saves the Point, where the user touched the drawable area to calculate the direction and distance of movement
-	private void OnFlowchartPressed(object sender, TouchEventArgs eventArgs)
-	{
-		if(FlowchartDrawer.graph == null) { return; }
+        CodeSection.Html = highlighter.initializeCodeHighligher("int main(){ \n char a[] = \"<Hallo><Welt>\"\nreturn 0; }\n\nint");
 
-		UserTouchX = eventArgs.Touches.FirstOrDefault().X;
-        UserTouchY = eventArgs.Touches.FirstOrDefault().Y;
+        flowchartDrawer = new FlowchartDrawer();
+        Resources["flowchart"] = flowchartDrawer;
+        state = new SelectState(flowchartDrawer, FlowchartView);
 
-        GraphicsViewOffsetX = FlowchartDrawer.offsetX;
-        GraphicsViewOffsetY = FlowchartDrawer.offsetY;
-    }
-
-    // Calculates the direction and distance the user moved the Pointer after touching the drawable area
-    // Moves the drawable objects accordingly
-    private void OnFlowchartDragged(object sender, TouchEventArgs eventArgs)
-	{
-        if (FlowchartDrawer.graph == null) { return; }
-
-        float dx = eventArgs.Touches.FirstOrDefault().X - UserTouchX;
-        float dy = eventArgs.Touches.FirstOrDefault().Y - UserTouchY;
-
-        FlowchartDrawer.offsetX = GraphicsViewOffsetX + dx;
-        FlowchartDrawer.offsetY = GraphicsViewOffsetY + dy;
+        // Declares Functionality for the Flowgraph to be moved by dragging the Pointer across the drawable area
         FlowchartView.Invalidate();
     }
+
 
     private void ImportCProgram(object sender, EventArgs args)
     {
@@ -59,7 +47,7 @@ public partial class CfgComparer : ContentPage
         FileResult? file = await FilePicker.Default.PickAsync();
         if (file == null) { return; }
 
-        FlowchartDrawer.graph = CfgFromFlowChart.GenerateGraphFromXML(file.FullPath);
+        flowchartDrawer.graph = CfgFromFlowChart.GenerateGraphFromXML(file.FullPath);
 
         FlowchartView.Invalidate();
     }
@@ -68,4 +56,20 @@ public partial class CfgComparer : ContentPage
         return;
     }
 
+    private void Move(object sender, EventArgs args){ state.ClearEventHandler(); state = new MoveFlowchartState(flowchartDrawer, FlowchartView); }
+    private void Scale(object sender, EventArgs args) { state.ClearEventHandler(); state = new ScaleFlowchartState(flowchartDrawer, FlowchartView); }
+    private void Select(object sender, EventArgs args) { state.ClearEventHandler(); state = new SelectState(flowchartDrawer, FlowchartView); }
+    private void Add(object sender, EventArgs args) { state.ClearEventHandler(); state = new AddElementState(flowchartDrawer, FlowchartView); }
+
+    private async void CodeWritten(object? sender, WebNavigatingEventArgs navigationArgs)
+    {
+        string[] queryParams = navigationArgs.Url.Split("?");
+        if (queryParams.Length != 2) return;
+
+        string newCode = HttpUtility.UrlDecode(new Regex("^newCode=").Replace(queryParams[1], ""));
+        string coloredCode = highlighter.updateCode(newCode);
+        navigationArgs.Cancel = true;
+
+        await CodeWebView.EvaluateJavaScriptAsync($"setInnerText('{coloredCode}')");
+    }
 }

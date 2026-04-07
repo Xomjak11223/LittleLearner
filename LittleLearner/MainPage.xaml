@@ -2,19 +2,12 @@
 <Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:LittleLearner.Tabs"
-<<<<<<< HEAD
-=======
              xmlns:cfg="clr-namespace:LittleLearner.CFG"
->>>>>>> master
              x:Class="LittleLearner.MainPage">
 
     <TabBar>
         <Tab Title="CFG" Icon="appicon.png">
-<<<<<<< HEAD
-            <ShellContent ContentTemplate="{DataTemplate views:CfgComparer}" />
-=======
             <ShellContent ContentTemplate="{DataTemplate cfg:CfgComparer}" />
->>>>>>> master
         </Tab>
         <Tab Title="LimitCS" Icon="appicon.png">
             <ShellContent ContentTemplate="{DataTemplate views:LimitCSolver}" />
