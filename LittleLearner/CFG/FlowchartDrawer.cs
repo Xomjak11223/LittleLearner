@@ -1,16 +1,11 @@
 ﻿using CfgCompLib.classes;
-using Microsoft.Maui.Graphics.Text;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using static Antlr4.Runtime.Atn.SemanticContext;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace LittleLearner.CFG
 {
     public class FlowchartDrawer : IDrawable
     {
-        private bool drawSelectionBox = false;
+        public enum PositionMarking { TOP, BOTTOM, LEFT, RIGHT, CENTER, NONE }
+
         public float offsetX = 0;
         public float offsetY = 0;
         public float zoom = 1;
@@ -25,6 +20,25 @@ namespace LittleLearner.CFG
 
         private readonly Color DefaultBorderColor = new Color(0, 0, 0);
         private readonly Color DefaultFillColor = new Color(255, 255, 255);
+
+        private readonly Color CreationWheelMarkedBorder = new Color(0, 0, 255);
+        private readonly Color CreationWheelMarkedArea = new Color(0, 0, 100);
+        private readonly Color CreationWheelDefaultBorder = new Color(0, 0, 0);
+        private readonly Color CreationWheelDefaultArea = new Color(252, 252, 252);
+
+        private bool drawSelectionBox = false;
+
+        public static readonly float creationInnerRadius = 30;
+        public static readonly float creationOuterRadius = 60;
+        private readonly float creationWidth = 60;
+        private readonly float creationHeight = 25;
+        private PositionMarking creationWheelMarking = PositionMarking.NONE;
+        private bool creationWheel = false;
+        private float creationX, creationY;
+        // Order: Top(45°, 135°), Left(135°, 225°), Bottom(225°, 315°), Right(315°, 45°), FullCircle(0°, 360°)
+        public static readonly int[] startAngle = { 45, 135, 225, 315, 0 };
+        public static readonly int[] endAngle = { 135, 225, 315, 45, 360 };
+        float[] radia = { creationOuterRadius, creationOuterRadius, creationOuterRadius, creationOuterRadius, creationInnerRadius };
 
         public Graph? graph = null;
         public void Draw(ICanvas canvas, RectF dirtyRect)
@@ -111,6 +125,37 @@ namespace LittleLearner.CFG
                     case Shape.Decision: drawDecision(canvas, "myText", tempNode.Shape.x, tempNode.Shape.y, tempNode.Shape.width, tempNode.Shape.height); break;
                 }
             }
+
+            // Draws the Selection Wheel when the user wants to create a new Shape
+            if (creationWheel)
+            {
+                int skip;
+
+                switch (creationWheelMarking)
+                {
+                    case PositionMarking.TOP: skip = 0; break;
+                    case PositionMarking.LEFT: skip = 1; break;
+                    case PositionMarking.BOTTOM: skip = 2; break;
+                    case PositionMarking.RIGHT: skip = 3; break;
+                    case PositionMarking.CENTER: skip = 4; break;
+                    default: skip = -1; break;
+                }
+
+                canvas.StrokeColor = CreationWheelDefaultBorder;
+                canvas.FillColor = CreationWheelDefaultArea;
+                for (int i = 0; i < startAngle.Length; i++)
+                {
+                    if(i == skip) { continue; }
+                    canvas.DrawArc(creationX, creationY, radia[i], radia[i], startAngle[i], endAngle[i], false, true);
+                }
+
+                if (skip != -1)
+                {
+                    canvas.StrokeColor = CreationWheelMarkedBorder;
+                    canvas.FillColor = CreationWheelMarkedArea;
+                    canvas.DrawArc(creationX, creationY, radia[skip], radia[skip], startAngle[skip], endAngle[skip], false, true);
+                }
+            }
         }
         public void drawStart(ICanvas canvas, float startX, float startY, float width, float height)
         {
@@ -165,6 +210,12 @@ namespace LittleLearner.CFG
 
             canvas.DrawLine(startCenterX, startCenterY, endCenterX, startCenterY);
             canvas.DrawLine(endCenterX, startCenterY, endCenterX, endCenterY);
+        }
+
+        public void drawCircleSlice(ICanvas canvas, float circleX, float circleY, float radius, float startAngle, float endAngle)
+        {
+            canvas.DrawArc(circleX, circleY, radius, radius, startAngle, endAngle, false, true);
+            //canvas.DrawLine();
         }
 
         public void selectShapesInArea(float startX, float startY, float endX, float endY)
@@ -265,5 +316,24 @@ namespace LittleLearner.CFG
                 }
             }
         }
+
+        public void drawCreationWheel(PositionMarking markedArea, float x, float y)
+        {
+            creationWheel = true;
+            creationX = x;
+            creationY = y;
+            creationWheelMarking = markedArea;
+        }
+
+        public void createNewShape(Shape shape, float x, float y)
+        {
+            if(graph == null) { return; }
+
+            hideCreationWheel();
+            //ShapeProperties shapeProperties = new(x - (creationWidth/2), y - (creationHeight/2), creationWidth, creationHeight, shape);
+            //Node newShape = new(0, null, null, null, shapeProperties);
+        }
+
+        public void hideCreationWheel() { creationWheel = false; }
     }
 }
