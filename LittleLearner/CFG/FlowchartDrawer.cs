@@ -280,7 +280,7 @@ namespace LittleLearner.CFG
             float height = (endY == startY) ? ((float)0.1) : (endY - startY);
 
             // Shape as a property is irrelevant, chose Shape.Action as filler
-            tempNode = new Node(0, null, null, null, new ShapeProperties(startX, startY, width, height, Shape.Action));
+            tempNode = new Node(0, null, null, null, new ShapeProperties(startX, startY, width, height, Shape.Action, false));
             drawSelectionBox = true;
         }
 
