@@ -21,17 +21,14 @@ namespace LittleLearner.CFG.StateLogic
 
         public override void OnFlowchartPressed(object? sender, TouchEventArgs eventArgs)
         {
-            if (flowchartDrawer.graph == null) { return; }
-
             boundStartX = eventArgs.Touches.FirstOrDefault().X;
             boundStartY = eventArgs.Touches.FirstOrDefault().Y;
 
-            moveSelected = flowchartDrawer.pointOnSelected(boundStartX, boundStartY);
+            moveSelected = flowchartDrawer.pointOnSelected(boundStartX, boundStartY) != null;
         }
 
         public override void OnFlowchartDragged(object? sender, TouchEventArgs eventArgs)
         {
-            if (flowchartDrawer.graph == null) { return; }
             boundEndX = eventArgs.Touches.FirstOrDefault().X;
             boundEndY = eventArgs.Touches.FirstOrDefault().Y;
 
@@ -51,7 +48,6 @@ namespace LittleLearner.CFG.StateLogic
 
         public void OnFlowchartReleased(object? sender, TouchEventArgs eventArgs)
         {
-            if (flowchartDrawer.graph == null) { return; }
             boundEndX = eventArgs.Touches.FirstOrDefault().X;
             boundEndY = eventArgs.Touches.FirstOrDefault().Y;
 

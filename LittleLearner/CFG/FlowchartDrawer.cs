@@ -9,8 +9,13 @@ namespace LittleLearner.CFG
         public float offsetX = 0;
         public float offsetY = 0;
         public float zoom = 1;
+        public static readonly int standartFontSize = 16;
+        public int fontSize = 16;
         public Node? tempNode = null;
         private readonly Color Background = new Color(0, 60, 100);
+
+        private readonly float widthLowerBound = 40;
+        private readonly float heightLowerBound = 20;
 
         private readonly Color SelectedBorderColor = new Color(0, 0, 255);
         private readonly Color SelectedFillColor = new Color(0, 0, 100);
@@ -27,18 +32,25 @@ namespace LittleLearner.CFG
         private readonly Color CreationWheelDefaultArea = new Color(252, 252, 252);
 
         private bool drawSelectionBox = false;
+        private bool creationWheel = false;
+        public bool temporaryConnection = false;
+        public bool editing = false;
 
-        public static readonly float creationInnerRadius = 30;
-        public static readonly float creationOuterRadius = 60;
+        public static readonly float creationInnerRadius = 15;
+        public static readonly float creationOuterRadius = 35;
         private readonly float creationWidth = 60;
         private readonly float creationHeight = 25;
         private PositionMarking creationWheelMarking = PositionMarking.NONE;
-        private bool creationWheel = false;
+
         private float creationX, creationY;
-        // Order: Top(45°, 135°), Left(135°, 225°), Bottom(225°, 315°), Right(315°, 45°), FullCircle(0°, 360°)
-        public static readonly int[] startAngle = { 45, 135, 225, 315, 0 };
-        public static readonly int[] endAngle = { 135, 225, 315, 45, 360 };
-        float[] radia = { creationOuterRadius, creationOuterRadius, creationOuterRadius, creationOuterRadius, creationInnerRadius };
+        
+        public static readonly int[] startAngle = { 45, 135, 225, 315};
+        public static readonly int[] endAngle = { 135, 225, 315, 45};
+
+        public float connectionStartX, connectionStartY, connectionEndX, connectionEndY;
+
+        public PositionMarking editingEdge1 = PositionMarking.NONE;
+        public PositionMarking editingEdge2 = PositionMarking.NONE;
 
         public Graph? graph = null;
         public void Draw(ICanvas canvas, RectF dirtyRect)
@@ -46,57 +58,63 @@ namespace LittleLearner.CFG
             canvas.FillColor = Background;
             canvas.FillRectangle(dirtyRect);
 
-            if (graph == null) { return; }
-            // Draws every single Shape
-            foreach(var nodeIndexPair in graph.GetNodes()) {
-                ShapeProperties shape = nodeIndexPair.Value.Shape;
-                float shapeStartX = zoom*(shape.x + offsetX);
-                float shapeEndX = zoom * (shape.x + shape.width + offsetX);
-                float shapeStartY = zoom * (shape.y + offsetY);
-                float shapeEndY = zoom * (shape.y + shape.height + offsetY);
+            if (graph != null) 
+            {
+                // Draws every single Shape
+                foreach(var nodeIndexPair in graph.GetNodes()) {
+                    ShapeProperties shape = nodeIndexPair.Value.Shape;
+                    float shapeStartX = absoluteToRelativeX(shape.x);
+                    float shapeEndX = absoluteToRelativeX(shape.x + shape.width);
+                    float shapeStartY = absoluteToRelativeY(shape.y);
+                    float shapeEndY = absoluteToRelativeY(shape.y + shape.height);
+                    float startCenterX = shapeStartX + (shape.width * zoom / 2);
+                    float startCenterY = shapeStartY + (shape.height * zoom / 2);
 
-                bool shapeNotInDirtyRect = (shapeStartX > dirtyRect.Width) || (shapeEndX < 0) || (shapeStartY > dirtyRect.Height) || (shapeEndY < 0);
+                    bool shapeNotInDirtyRect = (shapeStartX > dirtyRect.Width) || (shapeEndX < 0) || (shapeStartY > dirtyRect.Height) || (shapeEndY < 0);
 
-                // Draws the connection to its succesor shape
-                // TODO Connections need to be shecked in both directions (of the start and end are out of bounds, the connection could still be visible)
-                foreach (Node child in nodeIndexPair.Value.GetSuccessors())
-                {
-                    float childStartX = zoom * (child.Shape.x + offsetX);
-                    float childEndX = zoom * (child.Shape.x + child.Shape.width + offsetX);
-                    float childStartY = zoom * (child.Shape.y + offsetY);
-                    float childEndY = zoom * (child.Shape.y + child.Shape.height + offsetY);
+                    // Draws the connection to its succesor shape
+                    // TODO Connections need to be shecked in both directions (of the start and end are out of bounds, the connection could still be visible)
+                    foreach (Node child in nodeIndexPair.Value.GetSuccessors())
+                    {
+                        float childStartX = absoluteToRelativeX(child.Shape.x);
+                        float childEndX = absoluteToRelativeX(child.Shape.x + child.Shape.width);
+                        float childStartY = absoluteToRelativeY(child.Shape.y);
+                        float childEndY = absoluteToRelativeY(child.Shape.y + child.Shape.height);
+                        float endCenterX = childStartX + (child.Shape.width * zoom / 2);
+                        float endCenterY = childStartY + (child.Shape.height * zoom / 2);
 
-                    bool childNotInDirtyRect = (childStartX > dirtyRect.Width) || (childEndX < 0) || (childStartY > dirtyRect.Height) || (childEndY < 0);
+                        bool childNotInDirtyRect = (childStartX > dirtyRect.Width) || (childEndX < 0) || (childStartY > dirtyRect.Height) || (childEndY < 0);
 
-                    if(!shapeNotInDirtyRect || !childNotInDirtyRect) { connectShapes(canvas, shapeStartX, shapeStartY, shape.width * zoom, shape.height * zoom, childStartX, childStartY, child.Shape.width * zoom, child.Shape.height * zoom); }
-                }
+                        if(!shapeNotInDirtyRect || !childNotInDirtyRect) { drawConnection(canvas, startCenterX, startCenterY, endCenterX, endCenterY); }
+                    }
 
-                if (shapeNotInDirtyRect) { continue; }
+                    if (shapeNotInDirtyRect) { continue; }
 
-                var labels = nodeIndexPair.Value.GetLabel();
-                string label = "NO LABEL";
-                if (labels != null)
-                {
-                    if(labels.Count != 0) label = labels[0];
-                }
+                    var labels = nodeIndexPair.Value.GetLabel();
+                    string label = "NO LABEL";
+                    if (labels != null)
+                    {
+                        if(labels.Count != 0) label = labels[0];
+                    }
 
-                if (shape.selected) 
-                {
-                    canvas.StrokeColor = SelectedBorderColor;
-                    canvas.FillColor = SelectedFillColor;
-                }
-                else 
-                {
-                    canvas.StrokeColor = DefaultBorderColor;
-                    canvas.FillColor = DefaultFillColor;
-                }
+                    if (shape.selected) 
+                    {
+                        canvas.StrokeColor = SelectedBorderColor;
+                        canvas.FillColor = SelectedFillColor;
+                    }
+                    else 
+                    {
+                        canvas.StrokeColor = DefaultBorderColor;
+                        canvas.FillColor = DefaultFillColor;
+                    }
 
-                // Draws the Flow Graph Shape
-                switch (shape.shape) {
-                    case Shape.Start: drawStart(canvas, shapeStartX, shapeStartY, shape.width * zoom, shape.height * zoom); break;
-                    case Shape.End: drawEnd(canvas, shapeStartX, shapeStartY, shape.width * zoom, shape.height * zoom); break;
-                    case Shape.Action: drawAction(canvas, label, shapeStartX, shapeStartY, shape.width * zoom, shape.height * zoom); break;
-                    case Shape.Decision: drawDecision(canvas, label, shapeStartX, shapeStartY, shape.width * zoom, shape.height * zoom); break;
+                    // Draws the Flow Graph Shape
+                    switch (shape.shape) {
+                        case Shape.Start: drawStart(canvas, shapeStartX, shapeStartY, shape.width * zoom, shape.height * zoom); break;
+                        case Shape.End: drawEnd(canvas, shapeStartX, shapeStartY, shape.width * zoom, shape.height * zoom); break;
+                        case Shape.Action: drawAction(canvas, label, shapeStartX, shapeStartY, shape.width * zoom, shape.height * zoom); break;
+                        case Shape.Decision: drawDecision(canvas, label, shapeStartX, shapeStartY, shape.width * zoom, shape.height * zoom); break;
+                    }
                 }
             }
 
@@ -111,19 +129,6 @@ namespace LittleLearner.CFG
                 canvas.StrokeColor = SelectoinBoxBorderColor;
                 canvas.FillColor = SelectoinBoxFillColor;
                 canvas.DrawRectangle(x, y, tempNode.Shape.width, tempNode.Shape.height);
-            }
-
-            // Draws the Node that the User wants to currently create
-            // TODO may need to be translated
-            if (false && tempNode != null)
-            {
-                switch (tempNode.Shape.shape)
-                {
-                    case Shape.Start: drawStart(canvas, tempNode.Shape.x, tempNode.Shape.y, tempNode.Shape.width, tempNode.Shape.height); break;
-                    case Shape.End: drawEnd(canvas, tempNode.Shape.x, tempNode.Shape.y, tempNode.Shape.width, tempNode.Shape.height); break;
-                    case Shape.Action: drawAction(canvas, "myText", tempNode.Shape.x, tempNode.Shape.y, tempNode.Shape.width, tempNode.Shape.height); break;
-                    case Shape.Decision: drawDecision(canvas, "myText", tempNode.Shape.x, tempNode.Shape.y, tempNode.Shape.width, tempNode.Shape.height); break;
-                }
             }
 
             // Draws the Selection Wheel when the user wants to create a new Shape
@@ -141,21 +146,52 @@ namespace LittleLearner.CFG
                     default: skip = -1; break;
                 }
 
+                // unselected circle slices
                 canvas.StrokeColor = CreationWheelDefaultBorder;
                 canvas.FillColor = CreationWheelDefaultArea;
                 for (int i = 0; i < startAngle.Length; i++)
                 {
                     if(i == skip) { continue; }
-                    canvas.DrawArc(creationX, creationY, radia[i], radia[i], startAngle[i], endAngle[i], false, true);
+                    drawCircleSlice(canvas, creationX, creationY, creationOuterRadius, startAngle[i], endAngle[i]);
                 }
 
-                if (skip != -1)
+                // selected circle slice
+                if (skip >= 0 && skip < 4)
                 {
                     canvas.StrokeColor = CreationWheelMarkedBorder;
                     canvas.FillColor = CreationWheelMarkedArea;
-                    canvas.DrawArc(creationX, creationY, radia[skip], radia[skip], startAngle[skip], endAngle[skip], false, true);
+                    drawCircleSlice(canvas, creationX, creationY, creationOuterRadius, startAngle[skip], endAngle[skip]);
                 }
+
+                // inner circle (selected or unselected)
+                if (skip == 4) 
+                {
+                    canvas.StrokeColor = CreationWheelMarkedBorder;
+                    canvas.FillColor = CreationWheelMarkedArea;
+                }
+                else 
+                {
+                    canvas.StrokeColor = CreationWheelDefaultBorder;
+                    canvas.FillColor = CreationWheelDefaultArea;
+                }
+                canvas.FillCircle(creationX, creationY, creationInnerRadius);
             }
+
+            if (editing && tempNode != null)
+            {
+                float startX = absoluteToRelativeX(tempNode.Shape.x);
+                float startY = absoluteToRelativeY(tempNode.Shape.y);
+                float endX = absoluteToRelativeX(tempNode.Shape.x + tempNode.Shape.width);
+                float endY = absoluteToRelativeY(tempNode.Shape.y + tempNode.Shape.height);
+
+                canvas.StrokeColor = SelectedBorderColor;
+                if (editingEdge1 == PositionMarking.TOP || editingEdge2 == PositionMarking.TOP){ canvas.DrawLine(startX, startY, endX, startY); }
+                if (editingEdge1 == PositionMarking.BOTTOM || editingEdge2 == PositionMarking.BOTTOM){ canvas.DrawLine(startX, endY, endX, endY); }
+                if (editingEdge1 == PositionMarking.LEFT || editingEdge2 == PositionMarking.LEFT){ canvas.DrawLine(startX, startY, startX, endY); }
+                if (editingEdge1 == PositionMarking.RIGHT || editingEdge2 == PositionMarking.RIGHT){ canvas.DrawLine(endX, startY, endX, endY); }
+            }
+
+            if (temporaryConnection){ drawConnection(canvas, connectionStartX, connectionStartY, connectionEndX, connectionEndY); }
         }
         public void drawStart(ICanvas canvas, float startX, float startY, float width, float height)
         {
@@ -197,25 +233,31 @@ namespace LittleLearner.CFG
         {
             RectF textBounds = new RectF(startX, startY, width, height);
 
-            canvas.FontSize = 16;
+            canvas.FontSize = fontSize;
             canvas.DrawString(text, textBounds, HorizontalAlignment.Center, VerticalAlignment.Center);
         }
 
-        public void connectShapes(ICanvas canvas, float startX, float startY, float startWidth, float startHeight, float endX, float endY, float endWidth, float endHeight)
+        public void drawConnection(ICanvas canvas, float startX, float startY, float endX, float endY)
         {
-            float startCenterX = startX + (startWidth / 2);
-            float startCenterY = startY + (startHeight / 2);
-            float endCenterX = endX + (endWidth / 2);
-            float endCenterY = endY + (endHeight / 2);
-
-            canvas.DrawLine(startCenterX, startCenterY, endCenterX, startCenterY);
-            canvas.DrawLine(endCenterX, startCenterY, endCenterX, endCenterY);
+            canvas.DrawLine(startX, startY, endX, startY);
+            canvas.DrawLine(endX, startY, endX, endY);
         }
 
         public void drawCircleSlice(ICanvas canvas, float circleX, float circleY, float radius, float startAngle, float endAngle)
         {
-            canvas.DrawArc(circleX, circleY, radius, radius, startAngle, endAngle, false, true);
-            //canvas.DrawLine();
+            int sign;
+            if((startAngle % 360 >= 0 && startAngle % 360 <= 90) || (startAngle % 360 >= 180 && startAngle % 360 <= 270)){ sign = -1; }
+            else { sign = 1; }
+
+            float endX = (float)(sign*Math.Cos((startAngle * Math.PI) / 180) * radius) + circleX;
+            float endY = (float)(sign*Math.Sin((startAngle * Math.PI) / 180) * radius) + circleY;
+            canvas.DrawLine(circleX, circleY, endX, endY);
+
+            endX = (float)(sign*Math.Cos((endAngle * Math.PI) / 180) * radius) + circleX;
+            endY = (float)(sign*Math.Sin((endAngle * Math.PI) / 180) * radius) + circleY;
+            canvas.DrawLine(circleX, circleY, endX, endY);
+
+            canvas.DrawArc(circleX - radius, circleY - radius, radius * 2, radius * 2, startAngle, endAngle, false, true);
         }
 
         public void selectShapesInArea(float startX, float startY, float endX, float endY)
@@ -244,10 +286,10 @@ namespace LittleLearner.CFG
                 ShapeProperties shape = nodeIndexPair.Value.Shape;
 
                 // Adding offset to every shape
-                float shapeStartX = zoom * (shape.x + offsetX);
-                float shapeEndX = zoom * (shape.x + shape.width + offsetX);
-                float shapeStartY = zoom * (shape.y + offsetY);
-                float shapeEndY = zoom * (shape.y + shape.height + offsetY);
+                float shapeStartX = absoluteToRelativeX(shape.x);
+                float shapeEndX = absoluteToRelativeX(shape.x + shape.width);
+                float shapeStartY = absoluteToRelativeY(shape.y);
+                float shapeEndY = absoluteToRelativeY(shape.y + shape.height);
 
                 // Case 1: Rectangle is partially in selection
                 if (startX <= shapeEndX && endX >= shapeStartX && startY <= shapeEndY && endY >= shapeStartY)
@@ -286,22 +328,27 @@ namespace LittleLearner.CFG
 
         public void hideSelectionArea() { this.drawSelectionBox = false; tempNode = null; }
 
-        public bool pointOnSelected(float x, float y)
+        public Node? pointOnSelected(float x, float y){ return pointHitsElement(x, y, true); }
+        public Node? pointOnElement(float x, float y){ return pointHitsElement(x, y, false); }
+        private Node? pointHitsElement(float x, float y, bool elementHasToBeSelected)
         {
-            if(graph == null) { return false; }
+            if (graph == null) { return null; }
 
-            foreach(var nodeIndexPair in graph.GetNodes())
+            foreach (var nodeIndexPair in graph.GetNodes())
             {
                 ShapeProperties shape = nodeIndexPair.Value.Shape;
-                float shapeStartX = zoom * (shape.x + offsetX);
-                float shapeEndX = zoom * (shape.x + shape.width + offsetX);
-                float shapeStartY = zoom * (shape.y + offsetY);
-                float shapeEndY = zoom * (shape.y + shape.height + offsetY);
+                float shapeStartX = absoluteToRelativeX(shape.x);
+                float shapeEndX = absoluteToRelativeX(shape.x + shape.width);
+                float shapeStartY = absoluteToRelativeY(shape.y);
+                float shapeEndY = absoluteToRelativeY(shape.y + shape.height);
 
-                if (x >= shapeStartX && x <= shapeEndX && y >= shapeStartY && y < shapeEndY) { return true; }
+                if (x >= shapeStartX && x <= shapeEndX && y >= shapeStartY && y < shapeEndY) {
+                    if (!elementHasToBeSelected) { return nodeIndexPair.Value; }
+                    else if (shape.selected) { return nodeIndexPair.Value; }
+                }
             }
 
-            return false;
+            return null;
         }
 
         public void moveSelected(float dx, float dy)
@@ -327,13 +374,110 @@ namespace LittleLearner.CFG
 
         public void createNewShape(Shape shape, float x, float y)
         {
-            if(graph == null) { return; }
+            if(graph == null) { graph = new Graph(); }
 
-            hideCreationWheel();
-            //ShapeProperties shapeProperties = new(x - (creationWidth/2), y - (creationHeight/2), creationWidth, creationHeight, shape);
-            //Node newShape = new(0, null, null, null, shapeProperties);
+            float transformedX = (x/zoom) - (creationWidth / 2);
+            float transformedY = (y/zoom) - (creationHeight / 2);
+
+            ShapeProperties shapeProperties = new(transformedX, transformedY, creationWidth, creationHeight, shape, false);
+            graph.AddNode(new Node(graph.GetNewID(), ["Filler"], null, null, shapeProperties));
         }
 
         public void hideCreationWheel() { creationWheel = false; }
+
+        public void hideTemporaryConnection() { temporaryConnection = false; }
+        public void createTemporaryConnection(float startX, float startY, float endX, float endY)
+        {
+            connectionStartX = startX;
+            connectionStartY = startY;
+            connectionEndX = endX;
+            connectionEndY = endY;
+            temporaryConnection = true;
+        }
+
+        public void setNodeSelection(int id, bool selected)
+        {
+            Node? node = graph.GetNode(id);
+            if (node == null) { return; }
+
+            node.Shape.selected = selected;
+        }
+
+        public void connectNodes(int parentID, int childID)
+        {
+            if(graph == null) { return; }
+
+            Node? parentNode = graph.GetNode(parentID);
+            Node? childNode = graph.GetNode(childID);
+            if (parentNode == null) { return; }
+            if (childNode == null) { return; }
+
+            graph.AddEdge(parentNode, childNode);
+        }
+
+
+        public void scaleCanvas(float newZoom)
+        {
+            if (graph == null) { return; }
+
+            if (newZoom >= 2) newZoom = 2;
+            if (newZoom <= 0.5) newZoom = (float)0.5;
+
+            zoom = newZoom;
+            fontSize = (int) (standartFontSize * newZoom);
+        }
+
+        public void hideEditing() { editing = false; }
+        public void selectEditingNode(Node node, PositionMarking p1, PositionMarking p2)
+        {
+            editing = true;
+            tempNode = node;
+            editingEdge1 = p1;
+            editingEdge2 = p2;
+        }
+
+        public void scaleNode(int nodeID, PositionMarking p1, PositionMarking p2, float dx, float dy)
+        {
+            if(graph == null) { return; }
+            
+            // Checks wether position markings are opposite of each other (Which should not be allowed)
+            if((p1 == PositionMarking.TOP && p2 == PositionMarking.BOTTOM) || (p1 == PositionMarking.BOTTOM && p2 == PositionMarking.TOP)) { return; }
+            if ((p1 == PositionMarking.LEFT && p2 == PositionMarking.RIGHT) || (p1 == PositionMarking.RIGHT && p2 == PositionMarking.LEFT)) { return; }
+
+            Node node = graph.GetNode(nodeID);
+
+            if (node == null) { return; }
+
+            if(p1 == PositionMarking.TOP || p2 == PositionMarking.TOP)
+            { 
+                if(node.Shape.height - dy >= heightLowerBound) { 
+                    node.Shape.y += dy;
+                    node.Shape.height -= dy;
+                }
+            }
+
+            if (p1 == PositionMarking.BOTTOM || p2 == PositionMarking.BOTTOM)
+            {
+                if (node.Shape.height + dy >= heightLowerBound) { node.Shape.height += dy; }
+            }
+
+            if (p1 == PositionMarking.LEFT || p2 == PositionMarking.LEFT)
+            {
+                if (node.Shape.width - dx >= widthLowerBound) { 
+                    node.Shape.x += dx;
+                    node.Shape.width -= dx;
+                }
+            }
+
+            if (p1 == PositionMarking.RIGHT || p2 == PositionMarking.RIGHT)
+            {
+                if (node.Shape.width + dx >= widthLowerBound) { node.Shape.width += dx; }
+            }
+        }
+
+        public float absoluteToRelativeX(float x) { return (x + offsetX) * zoom; }
+        public float absoluteToRelativeY(float y) { return (y + offsetY) * zoom; }
+        public float relativeToAbsoluteX(float x) { return (x - offsetX) / zoom; }
+        public float relativeToAbsoluteY(float y) { return (y - offsetY) / zoom; }
     }
 }
