@@ -4,21 +4,17 @@
              xmlns:fc="clr-namespace:LittleLearner.CFG"
              x:Class="LittleLearner.CFG.CfgComparer">
 
-    
     <ContentPage.Resources>
         <fc:FlowchartDrawer x:Key="flowchart" />
     </ContentPage.Resources>
-    
-    <ContentPage.MenuBarItems>
-        <MenuBarItem Text="C-Program">
-            <MenuFlyoutItem Text="Import" Clicked="ImportCProgram"/>
-            <MenuFlyoutItem Text="Save" Clicked="SaveCProgram"/>
-        </MenuBarItem>
-        <MenuBarItem Text="CFG">
-            <MenuFlyoutItem Text="Import" Clicked="ImportCFG"/>
-            <MenuFlyoutItem Text="Save" Clicked="SaveCFG"/>
-        </MenuBarItem>
-    </ContentPage.MenuBarItems>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Import Code" Order="Primary" Clicked="ImportCProgram"/>
+        <ToolbarItem Text="Save Code" Order="Primary" Clicked="SaveCProgram"/>
+
+        <ToolbarItem Text="Import Graph" Order="Primary" Clicked="ImportCFG"/>
+        <ToolbarItem Text="Save Graph" Order="Primary"  Clicked="SaveCFG"/>
+    </ContentPage.ToolbarItems>
 
     <Grid ColumnDefinitions="*, *">
         <!-- Editor BackgroundColor="#003C64" Grid.Column="0" /-->

@@ -15,8 +15,11 @@ namespace LittleLearner
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
+            builder.Services.AddSingleton<LittleLearner.LCS.LimitCSolver>();
+            builder.Services.AddSingleton<LittleLearner.LCS.Protocol>();
+
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();

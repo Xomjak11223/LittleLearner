@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="LittleLearner.Tabs.LimitCSolver">
+             x:Class="LittleLearner.LCS.LimitCSolver"
+             xmlns:Lables="clr-namespace:LittleLearner.LCS"
+             x:DataType="Lables:Protocol">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Import Code" Clicked="ImportCProgram"/>
+
+        <ToolbarItem Text="Save Code" Clicked="SaveCProgram"/>
+
+        <ToolbarItem Text="Import Graph" Clicked="ImportLables"/>
+        <ToolbarItem Text="Sync" Order="Secondary" Clicked="Sync"/>
+    </ContentPage.ToolbarItems>
+    
     <Grid ColumnDefinitions="*, *">
         <!--Code-->
         <AbsoluteLayout>
@@ -48,12 +60,11 @@
         </AbsoluteLayout>
 
         <!--Lables-->
-        <Grid Grid.Column="1" RowDefinitions="*, Auto">
-            <Label Grid.Row="0" Text="Put your Text here" BackgroundColor="#003C64" />
-
-            <BoxView Grid.Row="1" BackgroundColor="#003C64" />
+        <Grid Grid.Column="1" RowDefinitions="*, Auto" x:Name="MainGrid">
             <Button Grid.Row="1" Grid.Column="0" HorizontalOptions="Start" Text="Prüfen"/>
             <Button Grid.Row="1" Grid.Column="1" HorizontalOptions="End" Text="Lösung"/>
+
+            <Grid Grid.Row="0"></Grid>
         </Grid>
     </Grid>
 </ContentPage>
