@@ -3,20 +3,21 @@ using LimitCSolver.LimitCGenerator;
 using LimitCSolver.LimitCInterpreter;
 using LimitCSolver.LimitCInterpreter.Parser;
 using System.Text.RegularExpressions;
+using LimitCSolver.LimitCInterpreter.Memory;
 
 namespace LittleLearner.LCS;
 
 public partial class LimitCSolver : ContentPage
 {
 	DifficultySettings? difficulty;
-    Protocol protocol;
+    Protocol currentProtocol;
 
-	public LimitCSolver(Protocol viewModel)
-	{
-		InitializeComponent();
-        protocol = viewModel;
-        BindingContext = protocol;
-	}
+	public LimitCSolver() { 
+        InitializeComponent();
+        currentProtocol = new Protocol();
+        MainGrid.RemoveAt(2);
+        MainGrid.Children.Add(currentProtocol.CreateGridTable());
+    }
 
 	public void ToggleCodeCreator(object sender, EventArgs arguments){ CodeCreator.IsVisible = !CodeCreator.IsVisible; }
 
@@ -30,10 +31,11 @@ public partial class LimitCSolver : ContentPage
         createdCode = createdCode.Replace("\\r\\n", "\r\n");
 
 		string coloredCode = createdCode;
-        Protocol newProtocol = GetProtocolFromCode(createdCode);
+        currentProtocol = GetProtocolFromCode(createdCode);
 
         // Creates the new Table on the UI-Thread
-        Grid grid = newProtocol.CreateGridTable();
+        Grid? grid = currentProtocol.CreateGridTable();
+
         MainGrid.RemoveAt(2);
         MainGrid.Children.Add(grid);
 
@@ -73,14 +75,12 @@ public partial class LimitCSolver : ContentPage
 
             foreach (var (name, addr) in args.VisibleVars)
             {
-                /* TODO need to look into what this does
                 TypedValue memVal = args.MemoryStorage.Memory[addr];
                 var p = new string('*', memVal.Type.Count(c => c == '*'));
 
-                npe.VarEntrys.Add(new VarViewModel($"{p}{name}", "", "", ""));
-                */
+                //npe.VarEntrys.Add(new VarViewModel($"{p}{name}", "", "", ""));
 
-                variables = variables.Append(name).ToArray<string>();
+                variables = variables.Append(p + name).ToArray<string>();
             }
             newProtocol.AddEmptyLabel(args.LabelNum, variables);
         };
@@ -110,5 +110,19 @@ public partial class LimitCSolver : ContentPage
             return null; // This is dirty. Errors should be handled and displayed to the user.
         else
             return limitCContext;
+    }
+
+    private void CompareSolutions(object sender, EventArgs args)
+    {
+        string[] answers = new string[0];
+        var rows = ((Grid)MainGrid.ElementAt(2)).Children;
+
+        foreach (Border row in rows)
+        {
+            if(row.Content == null || !typeof(Editor).Equals(row.Content.GetType())) continue;
+
+            Editor content = (Editor) row.Content;
+            answers.Append(content.Text);
+        }
     }
 }

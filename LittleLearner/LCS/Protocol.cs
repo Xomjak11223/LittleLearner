@@ -1,11 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Maui.Controls.Shapes;
 
 namespace LittleLearner.LCS
 {
     public partial class Protocol : ObservableObject
     {
         private string[] variables = new string[0];
-        private Dictionary<int, string[]> rows = new Dictionary<int, string[]>();
+        private Dictionary<int, String[]> rows = new Dictionary<int, String[]>();
+        private static Color primaryRowColor = Color.FromRgba("#CBCBCB");
+        private static Color secondaryRowColor = Color.FromRgba("#E1E1E1");
+        private static Color notExistingRowColor = Color.FromRgba("#222222");
 
         public Protocol() { }
 
@@ -22,22 +26,48 @@ namespace LittleLearner.LCS
 
                 foreach (int key in rows.Keys)
                 {
-                    rows[key] = rows[key].Append("").ToArray<string>();
+                    rows[key] = rows[key].Append(null).ToArray<String>();
                 }
             }
 
             // Creates the new row of Labels
-            rows.Add(labelNumber, new string[this.variables.Length]);
+            String[] newLabel = new string[this.variables.Length];
+            for (int i = 0; i < newLabel.Length; i++) { newLabel[i] = ""; }
+            rows.Add(labelNumber, newLabel);
         }
 
-        public Grid CreateGridTable()
+        public Grid? CreateGridTable()
         {
             Grid grid = new Grid();
+            //frame
 
-            Label IdColumn = new Label();
-            IdColumn.Background = Color.FromRgba("#003C64");
-            IdColumn.Text = "ID";
-            IdColumn.HorizontalTextAlignment = TextAlignment.Center;
+            // Template kann nicht erstellt werden, error Template anzeigen
+            if (variables.Length == 0 || rows.Count == 0)
+            {
+                Label ErrorColumn = new Label();
+                ErrorColumn.Background = Color.FromRgba("#003C64");
+                ErrorColumn.Text = "Aus dem bestehdem Code konnte keine Tabelle erstellt werden";
+                ErrorColumn.HorizontalTextAlignment = TextAlignment.Center;
+                ErrorColumn.VerticalTextAlignment = TextAlignment.Center;
+
+                grid.Add(ErrorColumn);
+                return grid;
+            }
+
+            Border IdColumn = new Border
+            {
+                Stroke = Colors.Black,
+                Background = Color.FromRgba("#003C64"),
+                StrokeThickness = 1,
+                Content = new Label
+                {
+                    Text = "Label",
+                    HorizontalTextAlignment = TextAlignment.Center,
+                    VerticalTextAlignment = TextAlignment.Center,
+                    FontAttributes = FontAttributes.Bold,
+                    TextColor = Colors.Black
+                }
+            };
 
             grid.AddRowDefinition(new RowDefinition(GridLength.Auto));
             grid.AddColumnDefinition(new ColumnDefinition(GridLength.Auto));
@@ -45,10 +75,20 @@ namespace LittleLearner.LCS
 
             for(int i = 0; i < variables.Count(); i++)
             {
-                Label ColumnHeader = new Label();
-                ColumnHeader.Text = variables[i];
-                ColumnHeader.Background = Color.FromRgba("#003C64");
-                ColumnHeader.HorizontalTextAlignment = TextAlignment.Center;
+                Border ColumnHeader = new Border
+                {
+                    Stroke = Colors.Black,
+                    Background = Color.FromRgba("#003C64"),
+                    StrokeThickness = 1,
+                    Content = new Label
+                    {
+                        Text = variables[i],
+                        HorizontalTextAlignment = TextAlignment.Center,
+                        VerticalTextAlignment = TextAlignment.Center,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = Colors.Black
+                    }
+                };
 
                 grid.AddColumnDefinition(new ColumnDefinition(GridLength.Star));
                 grid.Add(ColumnHeader, i+1, 0);
@@ -58,26 +98,75 @@ namespace LittleLearner.LCS
             {
                 int labelNumber = rows.ElementAt(i).Key;
                 string[] row = rows.ElementAt(i).Value;
-                Color backgroundColor = i % 2 == 0 ? (Color.FromRgba("#CBCBCB")) : (Color.FromRgba("#E1E1E1"));
+                Color backgroundColor = i % 2 == 0 ? primaryRowColor : secondaryRowColor;
 
-                Label labelNumberView = new Label();
-                labelNumberView.Text = ("" + labelNumber);
-                labelNumberView.Background = backgroundColor;
-                labelNumberView.VerticalTextAlignment = TextAlignment.Center;
+
+                Border labelNumberView = new Border
+                {
+                    Stroke = Colors.Black,
+                    Background = backgroundColor,
+                    StrokeThickness = 1,
+                    Content = new Label
+                    {
+                        Text = ("" + labelNumber),
+                        HorizontalTextAlignment = TextAlignment.Center,
+                        VerticalTextAlignment = TextAlignment.Center,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = Colors.Black
+                    }
+                };
 
                 grid.AddRowDefinition(new RowDefinition(GridLength.Star));
                 grid.Add(labelNumberView, 0, i + 1);
 
                 for(int j = 0; j < row.Length; j++)
                 {
-                    Editor labelValue = new Editor();
-                    labelValue.Background = backgroundColor;
+                    Border labelValue;
+
+                    if (row[j] == null)
+                    {
+                        labelValue = new Border
+                        {
+                            Stroke = Colors.Black,
+                            Background = notExistingRowColor,
+                            StrokeThickness = 1,
+                            Content = new Label
+                            {
+                                Text = "-",
+                                HorizontalTextAlignment = TextAlignment.Center,
+                                VerticalTextAlignment = TextAlignment.Center,
+                                FontAttributes = FontAttributes.Bold,
+                                TextColor = Colors.Black
+                            }
+                        };
+                    }
+                    else
+                    {
+                        labelValue = new Border
+                        {
+                            Stroke = Colors.Black,
+                            Background = backgroundColor,
+                            StrokeThickness = 1,
+                            Content = new Editor
+                            {
+                                HorizontalTextAlignment = TextAlignment.Center,
+                                VerticalTextAlignment = TextAlignment.Center,
+                                FontAttributes = FontAttributes.Bold,
+                                TextColor = Colors.Black
+                            }
+                        };
+                    }
 
                     grid.Add(labelValue, j + 1, i + 1);
                 }
             }
 
             return grid;
+        }
+
+        public void protocolAdapter(string[] input)
+        {
+
         }
     }
 }
