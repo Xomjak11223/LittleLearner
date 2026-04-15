@@ -32,7 +32,8 @@ namespace LittleLearner.CFG.StateLogic
 
             float shapeX = flowchartDrawer.absoluteToRelativeX(selectedNode.Shape.x);
             float shapeY = flowchartDrawer.absoluteToRelativeY(selectedNode.Shape.y);
-            PositionMarking[] positions = PositionsMarked(endX, endY, shapeX, shapeY, selectedNode.Shape.width / flowchartDrawer.zoom, selectedNode.Shape.height / flowchartDrawer.zoom);
+
+            PositionMarking[] positions = PositionsMarked(startX, startY, shapeX, shapeY, selectedNode.Shape.width * flowchartDrawer.zoom, selectedNode.Shape.height * flowchartDrawer.zoom);
             if (positions[0] == PositionMarking.NONE && positions[1] == PositionMarking.NONE){ return; }
 
             position1 = positions[0];
@@ -51,8 +52,8 @@ namespace LittleLearner.CFG.StateLogic
             endX = eventArgs.Touches.FirstOrDefault().X;
             endY = eventArgs.Touches.FirstOrDefault().Y;
 
-            float dx = endX - startX;
-            float dy = endY - startY;
+            float dx = (endX - startX) / flowchartDrawer.zoom;
+            float dy = (endY - startY) / flowchartDrawer.zoom;
 
             startX = endX;
             startY = endY;
@@ -84,16 +85,16 @@ namespace LittleLearner.CFG.StateLogic
         {
             if (flowchartDrawer.graph == null) { return; }
 
-            endX = eventArgs.Touches.FirstOrDefault().X;
-            endY = eventArgs.Touches.FirstOrDefault().Y;
+            startX = eventArgs.Touches.FirstOrDefault().X;
+            startY = eventArgs.Touches.FirstOrDefault().Y;
 
-            selectedNode = flowchartDrawer.pointOnElement(endX, endY);
+            selectedNode = flowchartDrawer.pointOnElement(startX, startY);
             if (selectedNode != null)
             {
                 float shapeX = flowchartDrawer.absoluteToRelativeX(selectedNode.Shape.x);
                 float shapeY = flowchartDrawer.absoluteToRelativeY(selectedNode.Shape.y);
 
-                PositionMarking[] positions = PositionsMarked(endX, endY, shapeX, shapeY, selectedNode.Shape.width / flowchartDrawer.zoom, selectedNode.Shape.height / flowchartDrawer.zoom);
+                PositionMarking[] positions = PositionsMarked(startX, startY, shapeX, shapeY, selectedNode.Shape.width * flowchartDrawer.zoom, selectedNode.Shape.height * flowchartDrawer.zoom);
                 if (positions[0] == PositionMarking.NONE && positions[1] == PositionMarking.NONE) 
                 {
                     flowchartDrawer.hideEditing();

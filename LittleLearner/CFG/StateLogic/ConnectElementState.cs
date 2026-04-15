@@ -53,11 +53,17 @@ namespace LittleLearner.CFG.StateLogic
 
         public void OnFlowchartReleased(object? sender, TouchEventArgs eventArgs)
         {
-            if (flowchartDrawer.graph == null || nodeSelected == null || nodeLastHovered == null) { return; }
+            flowchartDrawer.hideTemporaryConnection();
+
+            if (nodeSelected != null) { flowchartDrawer.setNodeSelection(nodeSelected.Id, false); }
+            if (flowchartDrawer.graph == null || nodeSelected == null || nodeLastHovered == null)
+            {
+                graphicsView.Invalidate();
+
+                return;
+            }
 
             flowchartDrawer.connectNodes(nodeSelected.Id, nodeLastHovered.Id);
-            flowchartDrawer.setNodeSelection(nodeSelected.Id, false);
-            flowchartDrawer.hideTemporaryConnection();
             nodeLastHovered = null;
             nodeSelected = null;
             graphicsView.Invalidate();

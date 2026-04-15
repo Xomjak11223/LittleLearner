@@ -32,6 +32,7 @@
                 <Button Text="Add" Clicked="Add" />
                 <Button Text="Connect" Clicked="Connect" />
                 <Button Text="Edit" Clicked="Edit" />
+                <Button Text="Delete" Clicked="Delete" />
             </HorizontalStackLayout>
             
             <GraphicsView Drawable="{DynamicResource flowchart}" x:Name="FlowchartView" Grid.Row="1" BackgroundColor="#003C64" />
