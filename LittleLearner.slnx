@@ -8,4 +8,5 @@
     <Project Path="LimitCSolver/LimitCInterpreter/LimitCInterpreter.csproj" />
   </Folder>
   <Project Path="LittleLearner/LittleLearner.csproj" />
+  <Project Path="SoftwareTests/SoftwareTests.csproj" Id="679d2afd-c425-4d12-bad9-fbf039a33c5a" />
 </Solution>
