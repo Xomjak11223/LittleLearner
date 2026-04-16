@@ -1,6 +1,5 @@
 using CfgCompLib;
 using CfgCompLib.classes;
-using ColorfulCode;
 using LittleLearner.CFG.StateLogic;
 using LittleLearner.SyntaxHighlighting;
 using System.Text.RegularExpressions;
@@ -14,12 +13,18 @@ public partial class CfgComparer : ContentPage
     public Shape SelectedShape = Shape.Start;
     public State state;
     public FlowchartDrawer flowchartDrawer;
+    public DashboardViewModel dashboardViewModel;
+    public string code;
 
-    public CfgComparer()
+    public CfgComparer(DashboardViewModel viewModel)
 	{
+        //TODO Anwender sollte die möglichkeit bekommen, den Graphen in DOT-Format exportieren zu können
         InitializeComponent();
+        BindingContext = viewModel;
+        dashboardViewModel = viewModel;
 
-        CodeSection.Html = highlighter.initializeCodeHighligher("int main(){ \n char a[] = \"<Hallo><Welt>\"\nreturn 0; }\n\nint");
+        code = "int main(){ \n char a[] = \"<Hallo><Welt>\"\nreturn 0; }\n\nint";
+        CodeSection.Html = highlighter.initializeCodeHighligher(code);
 
         flowchartDrawer = new FlowchartDrawer();
         Resources["flowchart"] = flowchartDrawer;
@@ -70,10 +75,40 @@ public partial class CfgComparer : ContentPage
         string[] queryParams = navigationArgs.Url.Split("?");
         if (queryParams.Length != 2) return;
 
-        string newCode = HttpUtility.UrlDecode(new Regex("^newCode=").Replace(queryParams[1], ""));
-        string coloredCode = highlighter.updateCode(newCode);
+        code = HttpUtility.UrlDecode(new Regex("^newCode=").Replace(queryParams[1], ""));
+        string coloredCode = highlighter.updateCode(code);
         navigationArgs.Cancel = true;
 
         await CodeWebView.EvaluateJavaScriptAsync($"setInnerText('{coloredCode}')");
+    }
+
+    public void CompareGraphs(object sender, EventArgs args)
+    {
+        if (!DashboardView.IsVisible)
+        {
+            //DashboardView.IsVisible = true;
+            CfgMainGrid.SetRowSpan(CodeWebView, 2);
+            CfgMainGrid.SetRowSpan(GraphLayout, 2);
+        }
+        else
+        {
+            //DashboardView.IsVisible = false;
+            CfgMainGrid.SetRowSpan(CodeWebView, 1);
+            CfgMainGrid.SetRowSpan(GraphLayout, 1);
+        }
+
+        dashboardViewModel.UpdateViewModel(null, null, 0);
+        return;
+
+        List<Graph> graphs = new List<Graph>();
+
+        Graph maximumCodeGraph = GraphUtils.ExpandToMaxGraph(flowchartDrawer.graph);
+        maximumCodeGraph.Description = "Control Flow Graph";
+
+        Graph maximumFlowChartGraph = GraphUtils.ExpandToMaxGraph(flowchartDrawer.graph);
+        maximumFlowChartGraph.Description = "Flow Graph";
+
+        graphs.Add(maximumCodeGraph);
+        graphs.Add(maximumFlowChartGraph);
     }
 }

@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:fc="clr-namespace:LittleLearner.CFG"
+             x:DataType="fc:DashboardViewModel"
              x:Class="LittleLearner.CFG.CfgComparer">
 
     <ContentPage.Resources>
@@ -14,17 +15,20 @@
 
         <ToolbarItem Text="Import Graph" Order="Primary" Clicked="ImportCFG"/>
         <ToolbarItem Text="Save Graph" Order="Primary"  Clicked="SaveCFG"/>
+        <ToolbarItem Text="Vergleichen" Order="Primary" Clicked="CompareGraphs"/>
     </ContentPage.ToolbarItems>
 
-    <Grid ColumnDefinitions="*, *">
+    <Grid ColumnDefinitions="*, *" RowDefinitions="*, 2*" x:Name="CfgMainGrid">
         <!-- Editor BackgroundColor="#003C64" Grid.Column="0" /-->
-        <WebView Grid.Column="0" x:Name="CodeWebView" Navigating="CodeWritten">
+        <!--Code-->
+        <WebView Grid.Column="0" Grid.RowSpan="2" x:Name="CodeWebView" Navigating="CodeWritten">
             <WebView.Source>
                 <HtmlWebViewSource x:Name="CodeSection" Html="&lt;span style='font-weight:bold;color:#a71d5d;'&gt;int&lt;/span&gt;" />
             </WebView.Source>
         </WebView>
 
-        <Grid Grid.Column="1" RowDefinitions="Auto, *, Auto">
+        <!--Graph-->
+        <Grid Grid.Column="1" Grid.RowSpan="2" RowDefinitions="Auto, *" x:Name="GraphLayout">
             <HorizontalStackLayout Grid.Row="0" Spacing="8" Padding="2">
                 <Button Text="Move" Clicked="Move" />
                 <Button Text="Scale" Clicked="Scale" />
@@ -34,11 +38,116 @@
                 <Button Text="Edit" Clicked="Edit" />
                 <Button Text="Delete" Clicked="Delete" />
             </HorizontalStackLayout>
-            
-            <GraphicsView Drawable="{DynamicResource flowchart}" x:Name="FlowchartView" Grid.Row="1" BackgroundColor="#003C64" />
 
-            <Button Grid.Row="2" Grid.Column="0" HorizontalOptions="Start" Margin="16, 8, 0, 8" Text="Prüfen"/>
-            <Button Grid.Row="2" Grid.Column="1" HorizontalOptions="End" Margin="0, 8, 16, 8" Text="Lösung"/>
+            <GraphicsView Drawable="{DynamicResource flowchart}" x:Name="FlowchartView" Grid.Row="1" BackgroundColor="#003C64" />
         </Grid>
+        
+        <!--Dashboard-->
+        <Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Stroke="Black" StrokeThickness="2" x:Name="DashboardView">
+            <Grid ColumnDefinitions="*,*,*,*" 
+                  RowDefinitions="Auto, *, Auto"
+                  RowSpacing="8"
+                  ColumnSpacing="8"
+                  Background="{StaticResource Primary}">
+
+                <Label Grid.Row="0" Grid.Column="0" FontSize="Small" Margin="12, 4, 0, 0" Text="Graphanalyse" />
+                <Label Grid.Row="0" Grid.Column="2" Text="{Binding ReceivedPoints}" />
+                <Label Grid.Row="0" Grid.Column="3" Text="{Binding SimilarityPercent}" />
+
+                <!--Kartenlayout Codeknoten-->
+                <Border Grid.Row="1" 
+                        Grid.RowSpan="2" 
+                        Grid.Column="0" 
+                        Margin="8, 0,  0, 0"
+                        StrokeShape="RoundRectangle, 16" 
+                        Stroke="{StaticResource PrimaryLight}"
+                        Background="{StaticResource PrimaryLight}">
+                    <Grid RowDefinitions="Auto, *, Auto">
+                        <Label Grid.Row="0" 
+                               FontSize="Medium" 
+                               FontAttributes="Bold" 
+                               HorizontalTextAlignment="Center"
+                               Text="Codeknoten" />
+
+                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="CodeGraphCards">
+                            <VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </ScrollView>
+                        <Label Grid.Row="2">Knoten/Kanten</Label>
+                    </Grid>
+                </Border>
+
+                <!--Kartenlayout Graphknote-->
+                <Border Grid.Row="1"
+                        Grid.RowSpan="2"
+                        Grid.Column="1"
+                        StrokeShape="RoundRectangle, 16"
+                        Stroke="{StaticResource PrimaryLight}"
+                        Background="{StaticResource PrimaryLight}">
+                    <Grid RowDefinitions="Auto, *, Auto">
+
+                        <Label Grid.Row="0" 
+                               FontSize="Medium" 
+                               FontAttributes="Bold" 
+                               HorizontalTextAlignment="Center"
+                               Text="Graphknoten" />
+
+                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="FlowGraphCards"></ScrollView>
+                        <Label Grid.Row="2">Knoten/Kanten</Label>
+                    </Grid>
+                </Border>
+
+                <!--Kartenlayout Matching Lables-->
+                <Border Grid.Row="1" 
+                        Grid.Column="2"
+                        StrokeShape="RoundRectangle, 16"
+                        Stroke="{StaticResource PrimaryLight}"
+                        Background="{StaticResource PrimaryLight}">
+                    <Grid RowDefinitions="Auto, *">
+                        <Label Grid.Row="0" 
+                               FontSize="Medium" 
+                               FontAttributes="Bold" 
+                               HorizontalTextAlignment="Center"
+                               Text="Labels Matching" />
+                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="MatchingLabels"></ScrollView>
+                    </Grid>
+                </Border>
+
+                <!--Kartenlayout Node Mappings-->
+                <Border Grid.Row="2" 
+                        Grid.Column="2"
+                        StrokeShape="RoundRectangle, 16"
+                        Stroke="{StaticResource PrimaryLight}"
+                        Background="{StaticResource PrimaryLight}">
+                    <Grid RowDefinitions="Auto, *">
+                        <Label Grid.Row="0" 
+                               FontSize="Medium" 
+                               FontAttributes="Bold" 
+                               HorizontalTextAlignment="Center"
+                               Text="Node Matchings" />
+                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="MatchingNodes"></ScrollView>
+                    </Grid>
+                </Border>
+
+                <!--Kartenlayout Edits-->
+                <Border Grid.Row="1" 
+                        Grid.Column="4" 
+                        StrokeShape="RoundRectangle, 16"
+                        Stroke="{StaticResource PrimaryLight}"
+                        Background="{StaticResource PrimaryLight}">
+                    <Grid RowDefinitions="Auto, *, Auto">
+                        <Label Grid.Row="0" 
+                               FontSize="Medium" 
+                               FontAttributes="Bold" 
+                               HorizontalTextAlignment="Center"
+                               Text="Edits" />
+                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="Edits"></ScrollView>
+                        <Grid Grid.Row="2">
+
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
     </Grid>
 </ContentPage>
