@@ -1,7 +1,4 @@
 ﻿using ColorfulCode;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace LittleLearner.SyntaxHighlighting
@@ -34,7 +31,7 @@ namespace LittleLearner.SyntaxHighlighting
                    <script>
                     let textContainer = document.querySelector(""#TextContainer"");
                     textContainer.addEventListener(""input"", codeEdited);
-                    function codeEdited(){{window.location.href = (""https://google.com?newCode="" + textContainer.innerText)}}
+                    function codeEdited(){{window.location.href = (""https://LittleLearner?newCode="" + textContainer.innerText)}}
                     function setInnerText(text){{ textContainer.innerHTML = text; }}
                    </script>";
         }

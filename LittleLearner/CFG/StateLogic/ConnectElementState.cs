@@ -24,12 +24,12 @@ namespace LittleLearner.CFG.StateLogic
 
             startX = eventArgs.Touches.FirstOrDefault().X;
             startY = eventArgs.Touches.FirstOrDefault().Y;
-            nodeSelected = flowchartDrawer.pointOnElement(startX, startY);
+            nodeSelected = flowchartDrawer.PointOnElement(startX, startY);
 
             if(nodeSelected == null) { return; }
-            flowchartDrawer.setNodeSelection(nodeSelected.Id, true);
-            startX = flowchartDrawer.absoluteToRelativeX(nodeSelected.Shape.x + (nodeSelected.Shape.width / 2));
-            startY = flowchartDrawer.absoluteToRelativeY(nodeSelected.Shape.y + (nodeSelected.Shape.height / 2));
+            flowchartDrawer.SetNodeSelection(nodeSelected.Id, true);
+            startX = GraphOperations.AbsolutToRelative(nodeSelected.Shape.x + (nodeSelected.Shape.width / 2), flowchartDrawer.offsetX, flowchartDrawer.zoom);
+            startY = GraphOperations.AbsolutToRelative(nodeSelected.Shape.y + (nodeSelected.Shape.height / 2), flowchartDrawer.offsetY, flowchartDrawer.zoom);
         }
 
         public override void OnFlowchartDragged(object? sender, TouchEventArgs eventArgs)
@@ -38,8 +38,8 @@ namespace LittleLearner.CFG.StateLogic
 
             if(nodeLastHovered != null && nodeLastHovered.Id != nodeSelected.Id)
             {
-                endX = flowchartDrawer.absoluteToRelativeX(nodeLastHovered.Shape.x + (nodeLastHovered.Shape.width / 2));
-                endY = flowchartDrawer.absoluteToRelativeY(nodeLastHovered.Shape.y + (nodeLastHovered.Shape.height / 2));
+                endX = GraphOperations.AbsolutToRelative(nodeLastHovered.Shape.x + (nodeLastHovered.Shape.width / 2), flowchartDrawer.offsetX, flowchartDrawer.zoom);
+                endY = GraphOperations.AbsolutToRelative(nodeLastHovered.Shape.y + (nodeLastHovered.Shape.height / 2), flowchartDrawer.offsetY, flowchartDrawer.zoom);
             }
             else
             {
@@ -47,15 +47,15 @@ namespace LittleLearner.CFG.StateLogic
                 endY = eventArgs.Touches.FirstOrDefault().Y;
             }
 
-            flowchartDrawer.createTemporaryConnection(startX, startY, endX, endY);
+            flowchartDrawer.CreateTemporaryConnection(startX, startY, endX, endY);
             graphicsView.Invalidate();
         }
 
         public void OnFlowchartReleased(object? sender, TouchEventArgs eventArgs)
         {
-            flowchartDrawer.hideTemporaryConnection();
+            flowchartDrawer.HideTemporaryConnection();
 
-            if (nodeSelected != null) { flowchartDrawer.setNodeSelection(nodeSelected.Id, false); }
+            if (nodeSelected != null) { flowchartDrawer.SetNodeSelection(nodeSelected.Id, false); }
             if (flowchartDrawer.graph == null || nodeSelected == null || nodeLastHovered == null)
             {
                 graphicsView.Invalidate();
@@ -63,7 +63,7 @@ namespace LittleLearner.CFG.StateLogic
                 return;
             }
 
-            flowchartDrawer.connectNodes(nodeSelected.Id, nodeLastHovered.Id);
+            flowchartDrawer.ConnectNodes(nodeSelected.Id, nodeLastHovered.Id);
             nodeLastHovered = null;
             nodeSelected = null;
             graphicsView.Invalidate();
@@ -75,12 +75,12 @@ namespace LittleLearner.CFG.StateLogic
 
             float hoverX = eventArgs.Touches.FirstOrDefault().X;
             float hoverY = eventArgs.Touches.FirstOrDefault().Y;
-            Node? hoveredNode = flowchartDrawer.pointOnElement(hoverX, hoverY);
+            Node? hoveredNode = flowchartDrawer.PointOnElement(hoverX, hoverY);
 
             if(hoveredNode == null) {
 
                 if (nodeLastHovered == null){ return; }
-                if (nodeSelected == null || nodeLastHovered.Id != nodeSelected.Id) { flowchartDrawer.setNodeSelection(nodeLastHovered.Id, false); }
+                if (nodeSelected == null || nodeLastHovered.Id != nodeSelected.Id) { flowchartDrawer.SetNodeSelection(nodeLastHovered.Id, false); }
 
                 nodeLastHovered = null;
                 graphicsView.Invalidate();
@@ -88,7 +88,7 @@ namespace LittleLearner.CFG.StateLogic
             }
 
             nodeLastHovered = hoveredNode;
-            flowchartDrawer.setNodeSelection(nodeLastHovered.Id, true);
+            flowchartDrawer.SetNodeSelection(nodeLastHovered.Id, true);
             graphicsView.Invalidate();
         }
 

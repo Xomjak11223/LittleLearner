@@ -23,8 +23,8 @@ namespace LittleLearner.CFG.StateLogic
 
             float hoverX = eventArgs.Touches.FirstOrDefault().X;
             float hoverY = eventArgs.Touches.FirstOrDefault().Y;
-            Node? node = flowchartDrawer.pointOnElement(hoverX, hoverY);
-            Edge? edge = flowchartDrawer.pointHitsEdge(hoverX, hoverY);
+            Node? node = flowchartDrawer.PointOnElement(hoverX, hoverY);
+            Edge? edge = flowchartDrawer.PointHitsEdge(hoverX, hoverY);
 
             if(node != null)
             {
@@ -49,8 +49,8 @@ namespace LittleLearner.CFG.StateLogic
 
             float hoverX = eventArgs.Touches.FirstOrDefault().X;
             float hoverY = eventArgs.Touches.FirstOrDefault().Y;
-            Node? hoveredNode = flowchartDrawer.pointOnElement(hoverX, hoverY);
-            Edge? hoveredEdge = flowchartDrawer.pointHitsEdge(hoverX, hoverY);
+            Node? hoveredNode = flowchartDrawer.PointOnElement(hoverX, hoverY);
+            Edge? hoveredEdge = flowchartDrawer.PointHitsEdge(hoverX, hoverY);
 
             if (hoveredNode == null)
             {

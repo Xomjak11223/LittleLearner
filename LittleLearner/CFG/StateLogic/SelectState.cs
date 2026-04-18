@@ -32,7 +32,7 @@ namespace LittleLearner.CFG.StateLogic
             graphicsView.MoveHoverInteraction -= HoverInteraction;
 
             if (nodeLastHovered != null) { nodeLastHovered.Shape.selected = true; }
-            moveSelected = flowchartDrawer.pointOnSelected(boundStartX, boundStartY) != null;
+            moveSelected = flowchartDrawer.PointOnSelected(boundStartX, boundStartY) != null;
         }
 
         public override void OnFlowchartDragged(object? sender, TouchEventArgs eventArgs)
@@ -45,13 +45,13 @@ namespace LittleLearner.CFG.StateLogic
             if (moveSelected)
             {
                 //TODO shapes can be moved around but after moving, every shape, exept for the one the mouse is hovering, will be deselected
-                flowchartDrawer.moveSelected(boundEndX - boundStartX, boundEndY - boundStartY);
+                flowchartDrawer.MoveSelected(boundEndX - boundStartX, boundEndY - boundStartY);
                 boundStartX = boundEndX;
                 boundStartY = boundEndY;
             }
             else
             {
-                flowchartDrawer.drawSelectionArea(boundStartX, boundStartY, boundEndX, boundEndY);
+                flowchartDrawer.DrawSelectionArea(boundStartX, boundStartY, boundEndX, boundEndY);
             }
             graphicsView.Invalidate();
         }
@@ -63,12 +63,12 @@ namespace LittleLearner.CFG.StateLogic
             boundEndX = eventArgs.Touches.FirstOrDefault().X;
             boundEndY = eventArgs.Touches.FirstOrDefault().Y;
 
-            flowchartDrawer.hideSelectionArea();
-            flowchartDrawer.selectShapesInArea(boundStartX, boundStartY, boundEndX, boundEndY);
+            flowchartDrawer.HideSelectionArea();
+            flowchartDrawer.SelectShapesInArea(boundStartX, boundStartY, boundEndX, boundEndY);
 
-            if (moveSelected || flowchartDrawer.nodesSelected() == 0)
+            if (moveSelected || flowchartDrawer.NodesSelected() == 0)
             {
-                nodeLastHovered = flowchartDrawer.pointOnElement(boundEndX, boundEndY);
+                nodeLastHovered = flowchartDrawer.PointOnElement(boundEndX, boundEndY);
                 graphicsView.StartHoverInteraction += HoverInteraction;
                 graphicsView.MoveHoverInteraction += HoverInteraction;
             }
@@ -83,13 +83,13 @@ namespace LittleLearner.CFG.StateLogic
 
             float hoverX = eventArgs.Touches.FirstOrDefault().X;
             float hoverY = eventArgs.Touches.FirstOrDefault().Y;
-            Node? hoveredNode = flowchartDrawer.pointOnElement(hoverX, hoverY);
+            Node? hoveredNode = flowchartDrawer.PointOnElement(hoverX, hoverY);
 
             if (hoveredNode == null)
             {
                 if (nodeLastHovered != null)
                 {
-                    flowchartDrawer.setNodeSelection(nodeLastHovered.Id, false);
+                    flowchartDrawer.SetNodeSelection(nodeLastHovered.Id, false);
                     nodeLastHovered = null;
                     graphicsView.Invalidate();
                 }
@@ -98,7 +98,7 @@ namespace LittleLearner.CFG.StateLogic
             }
 
             nodeLastHovered = hoveredNode;
-            flowchartDrawer.setNodeSelection(nodeLastHovered.Id, true);
+            flowchartDrawer.SetNodeSelection(nodeLastHovered.Id, true);
             graphicsView.Invalidate();
         }
 

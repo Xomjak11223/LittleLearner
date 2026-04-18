@@ -24,7 +24,7 @@ namespace LittleLearner.CFG.StateLogic
         {
             startPositionX = eventArgs.Touches.FirstOrDefault().X;
             startPositionY = eventArgs.Touches.FirstOrDefault().Y;
-            flowchartDrawer.drawCreationWheel(FlowchartDrawer.PositionMarking.CENTER, startPositionX, startPositionY);
+            flowchartDrawer.DrawCreationWheel(FlowchartDrawer.PositionMarking.CENTER, startPositionX, startPositionY);
             graphicsView.Invalidate();
         }
 
@@ -47,7 +47,7 @@ namespace LittleLearner.CFG.StateLogic
             else if (vectorAngle >= 0 && vectorAngle < radiance_45 && endPositionX < startPositionX) { marking = FlowchartDrawer.PositionMarking.LEFT; }
             else { marking = FlowchartDrawer.PositionMarking.RIGHT; }
 
-            flowchartDrawer.drawCreationWheel(marking, startPositionX, startPositionY);
+            flowchartDrawer.DrawCreationWheel(marking, startPositionX, startPositionY);
             graphicsView.Invalidate();
         }
 
@@ -64,7 +64,7 @@ namespace LittleLearner.CFG.StateLogic
             vectorAngle = (float) Math.Abs((Math.Asin(height / vectorLength) % (2*Math.PI)));
 
             if (vectorLength < FlowchartDrawer.creationInnerRadius || vectorLength > FlowchartDrawer.creationOuterRadius) { 
-                flowchartDrawer.hideCreationWheel();
+                flowchartDrawer.HideCreationWheel();
                 graphicsView.Invalidate();
                 return;
             }
@@ -74,8 +74,8 @@ namespace LittleLearner.CFG.StateLogic
             else if (vectorAngle >= 0 && vectorAngle < radiance_45 && endPositionX < startPositionX) { shape = Shape.Decision; }
             else { shape = Shape.Action; }
 
-            flowchartDrawer.createNewShape(shape, startPositionX, startPositionY);
-            flowchartDrawer.hideCreationWheel();
+            flowchartDrawer.CreateNewShape(shape, startPositionX, startPositionY);
+            flowchartDrawer.HideCreationWheel();
             graphicsView.Invalidate();
         }
 

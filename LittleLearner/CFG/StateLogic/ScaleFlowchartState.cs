@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LittleLearner.CFG.StateLogic
+﻿namespace LittleLearner.CFG.StateLogic
 {
     public class ScaleFlowchartState : State
     {
@@ -33,7 +29,7 @@ namespace LittleLearner.CFG.StateLogic
             endPositionX = eventArgs.Touches.FirstOrDefault().X;
             endPositionY = eventArgs.Touches.FirstOrDefault().Y;
 
-            flowchartDrawer.scaleCanvas(startPositionX, startPositionY, endPositionX, endPositionY);
+            flowchartDrawer.ScaleCanvas(startPositionX, startPositionY, endPositionX, endPositionY);
             graphicsView.Invalidate();
         }
 
@@ -43,7 +39,7 @@ namespace LittleLearner.CFG.StateLogic
             endPositionX = eventArgs.Touches.FirstOrDefault().X;
             endPositionY = eventArgs.Touches.FirstOrDefault().Y;
 
-            flowchartDrawer.scaleCanvas(startPositionX, startPositionY, endPositionX, endPositionY);
+            flowchartDrawer.ScaleCanvas(startPositionX, startPositionY, endPositionX, endPositionY);
             flowchartDrawer.HideScalingWheel();
             graphicsView.Invalidate();
         }

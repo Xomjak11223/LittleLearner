@@ -23,7 +23,7 @@ public partial class CfgComparer : ContentPage
         BindingContext = viewModel;
         dashboardViewModel = viewModel;
 
-        code = "int main(){ \n char a[] = \"<Hallo><Welt>\"\nreturn 0; }\n\nint";
+        code = "int main(){\n\treturn 0;\n}";
         CodeSection.Html = highlighter.initializeCodeHighligher(code);
 
         flowchartDrawer = new FlowchartDrawer();
@@ -84,31 +84,18 @@ public partial class CfgComparer : ContentPage
 
     public void CompareGraphs(object sender, EventArgs args)
     {
-        if (!DashboardView.IsVisible)
+        if (!DashboardLayout.IsVisible)
         {
-            //DashboardView.IsVisible = true;
-            CfgMainGrid.SetRowSpan(CodeWebView, 2);
-            CfgMainGrid.SetRowSpan(GraphLayout, 2);
+            DashboardLayout.IsVisible = true;
+            CfgMainGrid.SetRowSpan(EditorLayout, 1);
         }
         else
         {
-            //DashboardView.IsVisible = false;
-            CfgMainGrid.SetRowSpan(CodeWebView, 1);
-            CfgMainGrid.SetRowSpan(GraphLayout, 1);
+            DashboardLayout.IsVisible = false;
+            CfgMainGrid.SetRowSpan(EditorLayout, 2);
         }
 
-        dashboardViewModel.UpdateViewModel(null, null, 0);
-        return;
 
-        List<Graph> graphs = new List<Graph>();
-
-        Graph maximumCodeGraph = GraphUtils.ExpandToMaxGraph(flowchartDrawer.graph);
-        maximumCodeGraph.Description = "Control Flow Graph";
-
-        Graph maximumFlowChartGraph = GraphUtils.ExpandToMaxGraph(flowchartDrawer.graph);
-        maximumFlowChartGraph.Description = "Flow Graph";
-
-        graphs.Add(maximumCodeGraph);
-        graphs.Add(maximumFlowChartGraph);
+        dashboardViewModel.UpdateViewModel(CfgFromCompiler.GenerateGraphFromRaw(code), flowchartDrawer.graph, 0);
     }
 }

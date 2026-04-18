@@ -17,25 +17,25 @@ namespace LittleLearner.CFG
         public ObservableCollection<string> editSteps;
 
         [ObservableProperty]
-        public Graph codeGraph;
+        public ObservableCollection<NodeForViewModel> codeGraphNodes;
 
         [ObservableProperty]
-        public Graph flowchartGraph;
+        public ObservableCollection<NodeForViewModel> flowchartGraphNodes;
 
         [ObservableProperty]
-        public double costsNodeInsert;
+        public double costNodeInsert;
 
         [ObservableProperty]
-        public double costsNodeDelete;
+        public double costNodeDelete;
 
         [ObservableProperty]
-        public double costsNodeRelabel;
+        public double costNodeRelabel;
 
         [ObservableProperty]
-        public double costsEdgeInsert;
+        public double costEdgeInsert;
 
         [ObservableProperty]
-        public double costsEdgeDelete;
+        public double costEdgeDelete;
 
         [ObservableProperty]
         public double totalCost;
@@ -54,14 +54,12 @@ namespace LittleLearner.CFG
             mcsNodes = new ObservableCollection<(Node, Node)>();
             editSteps = new ObservableCollection<string>();
             similarLabels = new ObservableCollection<(double, string, string)>();
-            codeGraph = new Graph();
-            flowchartGraph = new Graph();
+            codeGraphNodes = new ObservableCollection<NodeForViewModel>();
+            flowchartGraphNodes = new ObservableCollection<NodeForViewModel>();
         }
 
         public void UpdateViewModel(Graph codeGraph, Graph flowchartGraph, double equalThreshold)
         {
-            SimilarityPercent = 100;
-            return;
             if (equalThreshold < 0 || equalThreshold > 1) { throw new ArgumentException("equalTreshold is not in range [0, 1]"); }
             if (codeGraph == null || flowchartGraph == null) { throw new ArgumentNullException("The input fields of DashboardViewModel.UpdateViewModel() should not be null"); }
 
@@ -74,8 +72,37 @@ namespace LittleLearner.CFG
             HashSet<string> editSteps = [];
             var (totalCosts, splitCosts) = GraphUtils.CalculateGED(codeGraph, flowchartGraph, out editSteps);
 
-            CodeGraph = codeGraph;
-            FlowchartGraph = flowchartGraph;
+            CodeGraphNodes.Clear();
+            foreach (var nodePair in codeGraph.GetNodes())
+            {
+                NodeForViewModel newNode = (NodeForViewModel)nodePair.Value;
+
+                foreach (Node succeessor in newNode.GetSuccessors()) newNode.OutgoingNodesString += $"{succeessor.Id}, ";
+                if (newNode.OutDegree > 0) newNode.OutgoingNodesString.Remove(newNode.OutgoingNodesString.Length - 2);
+
+                foreach (Node predecessors in newNode.GetPredecessors()) newNode.IngoingNodesString += $"{predecessors.Id}, ";
+                if (newNode.OutDegree > 0) newNode.IngoingNodesString.Remove(newNode.IngoingNodesString.Length - 2);
+
+                newNode.Title = newNode.LabelToString();
+
+                CodeGraphNodes.Add(newNode);
+            }
+
+            FlowchartGraphNodes.Clear();
+            foreach (var nodePair in flowchartGraph.GetNodes())
+            {
+                NodeForViewModel newNode = (NodeForViewModel) nodePair.Value;
+
+                foreach (Node succeessor in newNode.GetSuccessors()) newNode.OutgoingNodesString += $"{succeessor.Id}, ";
+                if (newNode.OutDegree > 0) newNode.OutgoingNodesString.Remove(newNode.OutgoingNodesString.Length - 2);
+
+                foreach (Node predecessors in newNode.GetPredecessors()) newNode.IngoingNodesString += $"{predecessors.Id}, ";
+                if (newNode.OutDegree > 0) newNode.IngoingNodesString.Remove(newNode.IngoingNodesString.Length - 2);
+
+                newNode.Title = newNode.LabelToString();
+
+                FlowchartGraphNodes.Add(newNode);
+            }
 
             McsNodes.Clear();
             foreach ((Node, Node) nodePair in mcs){ McsNodes.Add(nodePair); }
@@ -96,11 +123,11 @@ namespace LittleLearner.CFG
             EditSteps.Clear();
             foreach (var edit in editSteps) EditSteps.Add(edit);
 
-            CostsNodeInsert = splitCosts.CostsNodeInsert;
-            CostsNodeDelete = splitCosts.CostsNodeDelete;
-            CostsNodeRelabel = splitCosts.CostsNodeRelabel;
-            CostsEdgeInsert = splitCosts.CostsEdgeInsert;
-            CostsEdgeDelete = splitCosts.CostsEdgeDelete;
+            CostNodeInsert = splitCosts.CostsNodeInsert;
+            CostNodeDelete = splitCosts.CostsNodeDelete;
+            CostNodeRelabel = splitCosts.CostsNodeRelabel;
+            CostEdgeInsert = splitCosts.CostsEdgeInsert;
+            CostEdgeDelete = splitCosts.CostsEdgeDelete;
             TotalCost = totalCosts;
 
             MaxPoints = 2 * codeGraph.NodeCount + codeGraph.EdgeCount;

@@ -143,5 +143,100 @@ namespace SoftwareTests
                 Assert.Throws<ArgumentException>(() => GraphOperations.PointAroundLine(15, 10, 10, 10, 20, 10, -1));
             }
         }
+        public class PointOnLine
+        {
+            [Theory]
+            [InlineData(10, 10, 10, 10, 20, 20)]
+            [InlineData(20, 20, 10, 10, 20, 20)]
+            [InlineData(15, 15, 10, 10, 20, 20)]
+
+            [InlineData(10, 10, 10, 10, 20, 10)]
+            [InlineData(20, 10, 10, 10, 20, 10)]
+            [InlineData(15, 10, 10, 10, 20, 10)]
+
+            [InlineData(10, 10, 10, 10, 10, 20)]
+            [InlineData(10, 20, 10, 10, 10, 20)]
+            [InlineData(10, 15, 10, 10, 10, 20)]
+
+            [InlineData(10, 10, 10, 10, 10, 10)]
+            public void PointOnLineTrue(float px, float py, float lineStartX, float lineStartY, float lineEndX, float lineEndY)
+            {
+                Assert.True(GraphOperations.PointOnLine(px, py, lineStartX, lineStartY, lineEndX, lineEndY));
+            }
+
+            [Theory]
+            [InlineData(9, 10, 10, 10, 20, 20)]
+            [InlineData(10, 9, 10, 10, 20, 20)]
+            [InlineData(21, 20, 10, 10, 20, 20)]
+            [InlineData(20, 21, 10, 10, 20, 20)]
+            [InlineData(15, 12, 10, 10, 20, 20)]
+            [InlineData(13, 7, 10, 10, 20, 20)]
+
+            [InlineData(15, 9, 10, 10, 20, 10)]
+            [InlineData(15, 11, 10, 10, 20, 10)]
+            [InlineData(9, 10, 10, 10, 20, 10)]
+            [InlineData(21, 10, 10, 10, 20, 10)]
+
+            [InlineData(5, 15, 10, 10, 10, 20)]
+            [InlineData(15, 15, 10, 10, 10, 20)]
+            [InlineData(10, 9, 10, 10, 10, 20)]
+            [InlineData(10, 21, 10, 10, 10, 20)]
+
+            [InlineData(10, 10, 20, 20, 20, 20)]
+            public void PointOnLineFalse(float px, float py, float lineStartX, float lineStartY, float lineEndX, float lineEndY)
+            {
+                Assert.False(GraphOperations.PointOnLine(px, py, lineStartX, lineStartY, lineEndX, lineEndY));
+            }
+        }
+        public class LinesIntersect
+        {
+            [Theory]
+            // Both horizontal lines
+            [InlineData(10, 10, 20, 10, 10, 10, 20, 10)]
+            [InlineData(10, 10, 20, 10, 15, 10, 17, 10)]
+            [InlineData(10, 10, 20, 10, 5, 10, 15, 10)]
+            [InlineData(10, 10, 20, 10, 15, 10, 25, 10)]
+            [InlineData(20, 10, 10, 10, 15, 10, 25, 10)]
+            [InlineData(10, 10, 20, 10, 5, 10, 25, 10)]
+            [InlineData(10, 10, 20, 10, 25, 10, 15, 10)]
+
+            // Both Vertical lines
+            [InlineData(10, 10, 10, 20, 10, 10, 10, 20)]
+            [InlineData(10, 10, 10, 20, 10, 15, 10, 17)]
+            [InlineData(10, 10, 10, 20, 10, 5, 10, 15)]
+            [InlineData(10, 10, 10, 20, 10, 15, 10, 25)]
+            [InlineData(10, 10, 10, 20, 10, 25, 10, 15)]
+            [InlineData(10, 10, 10, 20, 10, 5, 10, 25)]
+            [InlineData(10, 10, 10, 20, 10, 25, 10, 5)]
+
+            // One Horizontal one Vertical
+            [InlineData(10, 10, 20, 10, 15, 5, 15, 17)]
+            [InlineData(17, 8, 25, 8, 19, 3, 19, 10)]
+            [InlineData(15, 5, 15, 17, 10, 10, 20, 10)]
+            [InlineData(20, 10, 10, 10, 15, 17, 15, 5)]
+
+            // Tilted Lines
+
+            // Points
+            [InlineData(10, 10, 10, 10, 10, 10, 10, 10)]
+            public void LinesIntersectTrue(float l1StartX, float l1StartY, float l1EdX, float l1EndY, float l2StartX, float l2StartY, float l2EdX, float l2EndY)
+            {
+                Assert.True(GraphOperations.LinesIntersect(l1StartX, l1StartY, l1EdX, l1EndY, l2StartX, l2StartY, l2EdX, l2EndY));
+            }
+
+            public void LinesIntersectFalse(float l1StartX, float l1StartY, float l2StartX, float l2StartY)
+            {
+
+            }
+        }
+
+        public class LineIntersectsRectangle
+        {
+
+        }
+        public class RectanglesIntersect
+        {
+
+        }
     }
 }
