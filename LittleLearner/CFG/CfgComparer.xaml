@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:fc="clr-namespace:LittleLearner.CFG"
-             x:DataType="fc:DashboardViewModel"
+             xmlns:vm="clr-namespace:LittleLearner.CFG.ViewModel"
+             x:DataType="vm:Dashboard"
              x:Class="LittleLearner.CFG.CfgComparer">
 
     <ContentPage.Resources>
@@ -84,7 +85,7 @@
                             <VerticalStackLayout>
                                 <CollectionView ItemsSource="{Binding CodeGraphNodes}">
                                     <CollectionView.ItemTemplate>
-                                        <DataTemplate x:DataType="{x:Type fc:NodeForViewModel}">
+                                        <DataTemplate x:DataType="{x:Type vm:NodeViewModel}">
                                             <Border StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Secondary}">
                                                 <Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *">
                                                     <Label Grid.Row="0" Grid.Column="0" FontSize="Medium" Text="{Binding Title}"/>
@@ -121,9 +122,9 @@
 
                         <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="FlowGraphCards">
                             <VerticalStackLayout>
-                                <CollectionView ItemsSource="{Binding CodeGraphNodes}">
+                                <CollectionView ItemsSource="{Binding FlowchartGraphNodes}">
                                     <CollectionView.ItemTemplate>
-                                        <DataTemplate x:DataType="{x:Type fc:NodeForViewModel}">
+                                        <DataTemplate x:DataType="{x:Type vm:NodeViewModel}">
                                             <Border StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Tertiary}">
                                                 <Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *">
                                                     <Label Grid.Row="0" Grid.Column="0" FontSize="Medium" Text="{Binding Title}"/>
@@ -159,16 +160,16 @@
                             <VerticalStackLayout>
                                 <CollectionView ItemsSource="{Binding SimilarLabels}">
                                     <CollectionView.ItemTemplate>
-                                        <DataTemplate>
+                                        <DataTemplate x:DataType="{x:Type vm:SimilarLabels}">
                                             <Grid ColumnDefinitions="*, *, *">
-                                                <Border StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Secondary}">
-                                                    <Label Grid.Column="0" FontAttributes="Bold" Text="{Binding Item2}"/>
+                                                <Border Grid.Column="0" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Secondary}">
+                                                    <Label Grid.Column="0" FontAttributes="Bold" Text="{Binding CodeLabel}"/>
                                                 </Border>
 
-                                                <Label Grid.Column="1" Text="{Binding Item1}" />
+                                                <Label Grid.Column="1" Text="{Binding Similarity}" />
 
-                                                <Border StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Tertiary}">
-                                                    <Label Grid.Column="2" FontAttributes="Bold" Text="{Binding Item3}" />
+                                                <Border Grid.Column="2" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Tertiary}">
+                                                    <Label Grid.Column="2" FontAttributes="Bold" Text="{Binding GraphLabel}" />
                                                 </Border>
                                             </Grid>
                                         </DataTemplate>

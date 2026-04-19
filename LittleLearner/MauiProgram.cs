@@ -16,7 +16,7 @@ namespace LittleLearner
                 });
 
             builder.Services.AddSingleton<LittleLearner.CFG.CfgComparer>();
-            builder.Services.AddSingleton<LittleLearner.CFG.DashboardViewModel>();
+            builder.Services.AddSingleton<LittleLearner.CFG.ViewModel.Dashboard>();
 
 #if DEBUG
             builder.Logging.AddDebug();

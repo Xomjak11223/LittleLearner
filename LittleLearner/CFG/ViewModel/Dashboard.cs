@@ -3,24 +3,24 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 using CfgCompLib;
 
-namespace LittleLearner.CFG
+namespace LittleLearner.CFG.ViewModel
 {
-    public partial class DashboardViewModel : ObservableObject
+    public partial class Dashboard : ObservableObject
     {
         [ObservableProperty]
         public ObservableCollection<(Node, Node)> mcsNodes; // (NodesFromCode, NodesFromGraph)
 
         [ObservableProperty]
-        public ObservableCollection<(double, string, string)> similarLabels; // (similarity in %, codeLabel, graphLabel)
+        public ObservableCollection<SimilarLabels> similarLabels;
 
         [ObservableProperty]
         public ObservableCollection<string> editSteps;
 
         [ObservableProperty]
-        public ObservableCollection<NodeForViewModel> codeGraphNodes;
+        public ObservableCollection<NodeViewModel> codeGraphNodes;
 
         [ObservableProperty]
-        public ObservableCollection<NodeForViewModel> flowchartGraphNodes;
+        public ObservableCollection<NodeViewModel> flowchartGraphNodes;
 
         [ObservableProperty]
         public double costNodeInsert;
@@ -49,18 +49,18 @@ namespace LittleLearner.CFG
         [ObservableProperty]
         public double similarityPercent;
 
-        public DashboardViewModel()
+        public Dashboard()
         {
             mcsNodes = new ObservableCollection<(Node, Node)>();
             editSteps = new ObservableCollection<string>();
-            similarLabels = new ObservableCollection<(double, string, string)>();
-            codeGraphNodes = new ObservableCollection<NodeForViewModel>();
-            flowchartGraphNodes = new ObservableCollection<NodeForViewModel>();
+            similarLabels = new ObservableCollection<SimilarLabels>();
+            codeGraphNodes = new ObservableCollection<NodeViewModel>();
+            flowchartGraphNodes = new ObservableCollection<NodeViewModel>();
         }
 
         public void UpdateViewModel(Graph codeGraph, Graph flowchartGraph, double equalThreshold)
         {
-            if (equalThreshold < 0 || equalThreshold > 1) { throw new ArgumentException("equalTreshold is not in range [0, 1]"); }
+            if (equalThreshold <= 0 || equalThreshold > 1) { throw new ArgumentException("equalTreshold is not in range [0, 1]"); }
             if (codeGraph == null || flowchartGraph == null) { throw new ArgumentNullException("The input fields of DashboardViewModel.UpdateViewModel() should not be null"); }
 
             codeGraph = GraphUtils.ExpandToMaxGraph(codeGraph);
@@ -75,13 +75,16 @@ namespace LittleLearner.CFG
             CodeGraphNodes.Clear();
             foreach (var nodePair in codeGraph.GetNodes())
             {
-                NodeForViewModel newNode = (NodeForViewModel)nodePair.Value;
+                NodeViewModel newNode = new NodeViewModel(nodePair.Value);
+                newNode.OutgoingNodesString = "";
+                newNode.IngoingNodesString = "";
+                newNode.Title = "";
 
                 foreach (Node succeessor in newNode.GetSuccessors()) newNode.OutgoingNodesString += $"{succeessor.Id}, ";
-                if (newNode.OutDegree > 0) newNode.OutgoingNodesString.Remove(newNode.OutgoingNodesString.Length - 2);
+                if (newNode.OutDegree > 0) newNode.OutgoingNodesString = newNode.OutgoingNodesString.Remove(newNode.OutgoingNodesString.Length - 2);
 
                 foreach (Node predecessors in newNode.GetPredecessors()) newNode.IngoingNodesString += $"{predecessors.Id}, ";
-                if (newNode.OutDegree > 0) newNode.IngoingNodesString.Remove(newNode.IngoingNodesString.Length - 2);
+                if (newNode.InDegree > 0) newNode.IngoingNodesString = newNode.IngoingNodesString.Remove(newNode.IngoingNodesString.Length - 2);
 
                 newNode.Title = newNode.LabelToString();
 
@@ -91,13 +94,16 @@ namespace LittleLearner.CFG
             FlowchartGraphNodes.Clear();
             foreach (var nodePair in flowchartGraph.GetNodes())
             {
-                NodeForViewModel newNode = (NodeForViewModel) nodePair.Value;
+                NodeViewModel newNode = new NodeViewModel(nodePair.Value);
+                newNode.OutgoingNodesString = "";
+                newNode.IngoingNodesString = "";
+                newNode.Title = "";
 
                 foreach (Node succeessor in newNode.GetSuccessors()) newNode.OutgoingNodesString += $"{succeessor.Id}, ";
-                if (newNode.OutDegree > 0) newNode.OutgoingNodesString.Remove(newNode.OutgoingNodesString.Length - 2);
+                if (newNode.OutDegree > 0) newNode.OutgoingNodesString = newNode.OutgoingNodesString.Remove(newNode.OutgoingNodesString.Length - 2);
 
                 foreach (Node predecessors in newNode.GetPredecessors()) newNode.IngoingNodesString += $"{predecessors.Id}, ";
-                if (newNode.OutDegree > 0) newNode.IngoingNodesString.Remove(newNode.IngoingNodesString.Length - 2);
+                if (newNode.InDegree > 0) newNode.IngoingNodesString = newNode.IngoingNodesString.Remove(newNode.IngoingNodesString.Length - 2);
 
                 newNode.Title = newNode.LabelToString();
 
@@ -115,12 +121,11 @@ namespace LittleLearner.CFG
                     foreach (Node? nodeFc in flowchartGraph.GetNodes().Values)
                     {
                         var (TotalEQ, _, _, _) = GraphUtils.CalculateLabelEquality(nodeFc.GetLabel()[0], nodeCfg.GetLabel()[0]);
-                        if (TotalEQ >= equalThreshold * 100) SimilarLabels.Add((TotalEQ, nodeCfg.GetLabel()[0], nodeFc.GetLabel()[0]));
+                        if (TotalEQ >= equalThreshold * 100) SimilarLabels.Add(new SimilarLabels(nodeCfg.GetLabel()[0], nodeFc.GetLabel()[0], TotalEQ));
                     }
                 }
             }
 
-            EditSteps.Clear();
             foreach (var edit in editSteps) EditSteps.Add(edit);
 
             CostNodeInsert = splitCosts.CostsNodeInsert;

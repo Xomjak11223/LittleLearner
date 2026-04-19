@@ -1,6 +1,7 @@
 using CfgCompLib;
 using CfgCompLib.classes;
 using LittleLearner.CFG.StateLogic;
+using LittleLearner.CFG.ViewModel;
 using LittleLearner.SyntaxHighlighting;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -13,15 +14,15 @@ public partial class CfgComparer : ContentPage
     public Shape SelectedShape = Shape.Start;
     public State state;
     public FlowchartDrawer flowchartDrawer;
-    public DashboardViewModel dashboardViewModel;
+    public Dashboard dashboard;
     public string code;
 
-    public CfgComparer(DashboardViewModel viewModel)
+    public CfgComparer(Dashboard viewModel)
 	{
         //TODO Anwender sollte die möglichkeit bekommen, den Graphen in DOT-Format exportieren zu können
         InitializeComponent();
         BindingContext = viewModel;
-        dashboardViewModel = viewModel;
+        dashboard = viewModel;
 
         code = "int main(){\n\treturn 0;\n}";
         CodeSection.Html = highlighter.initializeCodeHighligher(code);
@@ -66,9 +67,8 @@ public partial class CfgComparer : ContentPage
     private void Select(object sender, EventArgs args) { state.ClearEventHandler(); state = new SelectState(flowchartDrawer, FlowchartView); }
     private void Add(object sender, EventArgs args) { state.ClearEventHandler(); state = new AddElementState(flowchartDrawer, FlowchartView); }
     private void Connect(object sender, EventArgs args) { state.ClearEventHandler(); state = new ConnectElementState(flowchartDrawer, FlowchartView); }
-    private void Edit(object sender, EventArgs args){ state.ClearEventHandler(); state = new EditElementState(flowchartDrawer, FlowchartView); }
+    private void Edit(object sender, EventArgs args){ state.ClearEventHandler(); state = new EditElementState(flowchartDrawer, FlowchartView, this); }
     private void Delete(object sender, EventArgs args) { state.ClearEventHandler(); state = new DeleteShapeState(flowchartDrawer, FlowchartView); }
-
 
     private async void CodeWritten(object? sender, WebNavigatingEventArgs navigationArgs)
     {
@@ -84,10 +84,18 @@ public partial class CfgComparer : ContentPage
 
     public void CompareGraphs(object sender, EventArgs args)
     {
+        if (flowchartDrawer.graph == null || string.IsNullOrEmpty(code)) return;
+
         if (!DashboardLayout.IsVisible)
         {
             DashboardLayout.IsVisible = true;
             CfgMainGrid.SetRowSpan(EditorLayout, 1);
+
+            string path = Path.Combine(FileSystem.AppDataDirectory, "code.c");
+            File.WriteAllText(path, code);
+
+            string codeGraphString = CfgFromCompiler.ImportCompilerCfgRaw(path);
+            dashboard.UpdateViewModel(CfgFromCompiler.GenerateGraphFromRaw(codeGraphString), flowchartDrawer.graph, 0.5);
         }
         else
         {
@@ -95,7 +103,5 @@ public partial class CfgComparer : ContentPage
             CfgMainGrid.SetRowSpan(EditorLayout, 2);
         }
 
-
-        dashboardViewModel.UpdateViewModel(CfgFromCompiler.GenerateGraphFromRaw(code), flowchartDrawer.graph, 0);
     }
 }

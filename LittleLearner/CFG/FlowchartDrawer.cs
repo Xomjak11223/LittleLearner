@@ -1,5 +1,6 @@
 ﻿using CfgCompLib;
 using CfgCompLib.classes;
+using System.Xml.Linq;
 
 namespace LittleLearner.CFG
 {
@@ -431,9 +432,14 @@ namespace LittleLearner.CFG
 
             float transformedX = GraphOperations.RelativeToAbsolut(x, offsetX, zoom) - (creationWidth / 2);
             float transformedY = GraphOperations.RelativeToAbsolut(y, offsetY, zoom) - (creationHeight / 2);
+            string labelText;
+
+            if (shape == Shape.Start) labelText = "Start";
+            else if (shape == Shape.End) labelText = "End";
+            else labelText = "Filler";
 
             ShapeProperties shapeProperties = new(transformedX, transformedY, creationWidth, creationHeight, shape, false);
-            graph.AddNode(new Node(graph.GetNewID(), ["Filler"], null, null, shapeProperties));
+            graph.AddNode(new Node(graph.GetNewID(), [labelText], null, null, shapeProperties));
         }
 
         public void HideCreationWheel() { creationWheel = false; }
@@ -558,6 +564,17 @@ namespace LittleLearner.CFG
 
                 return (!edge.StartNode.Equals(node) && !edge.EndNode.Equals(node));
             }).ToArray<Edge>();
+        }
+
+        public void ReplaceNodeInEdges(Node oldNode, Node newNode)
+        {
+            if(oldNode == null || newNode == null) { return; }
+
+            foreach (Edge edge in edges) 
+            {
+                if (oldNode.Equals(edge.StartNode)) edge.StartNode = newNode;
+                if (oldNode.Equals(edge.EndNode)) edge.EndNode = newNode;
+            }
         }
     }
 }

@@ -8,9 +8,13 @@ namespace LittleLearner.CFG.StateLogic
         public static int lambda = 8;
         float startX, startY, endX, endY;
         Node? selectedNode;
+        Node? relabledNode;
         PositionMarking position1, position2;
+        ContentPage contentPage;
+        Task resetTask = null;
+        string newLabel;
 
-        public EditElementState(FlowchartDrawer flowchartDrawer, GraphicsView graphicsView) : base(flowchartDrawer, graphicsView)
+        public EditElementState(FlowchartDrawer flowchartDrawer, GraphicsView graphicsView, ContentPage contentPage) : base(flowchartDrawer, graphicsView)
         {
             graphicsView.StartInteraction += OnFlowchartPressed;
             graphicsView.DragInteraction += OnFlowchartDragged;
@@ -18,6 +22,7 @@ namespace LittleLearner.CFG.StateLogic
 
             graphicsView.StartHoverInteraction += HoverInteraction;
             graphicsView.MoveHoverInteraction += HoverInteraction;
+            this.contentPage = contentPage;
         }
 
         public override void OnFlowchartPressed(object? sender, TouchEventArgs eventArgs)
@@ -34,7 +39,13 @@ namespace LittleLearner.CFG.StateLogic
             float shapeY = GraphOperations.AbsolutToRelative(selectedNode.Shape.y, flowchartDrawer.offsetY, flowchartDrawer.zoom);
 
             PositionMarking[] positions = PositionsMarked(startX, startY, shapeX, shapeY, selectedNode.Shape.width * flowchartDrawer.zoom, selectedNode.Shape.height * flowchartDrawer.zoom);
-            if (positions[0] == PositionMarking.NONE && positions[1] == PositionMarking.NONE){ return; }
+            if (positions[0] == PositionMarking.NONE && positions[1] == PositionMarking.NONE){
+                if (relabledNode != null && selectedNode == relabledNode) { Popup(selectedNode); return; }
+                if (resetTask == null || resetTask.IsCompleted) resetTask = ResetAfterTime(1);
+
+                relabledNode = selectedNode;
+                return; 
+            }
 
             position1 = positions[0];
             position2 = positions[1];
@@ -149,5 +160,22 @@ namespace LittleLearner.CFG.StateLogic
 
             return [PositionMarking.NONE, PositionMarking.NONE];
         }
+
+        public async Task ResetAfterTime(int timeInSeconds) { await Task.Delay(timeInSeconds * 1000); relabledNode = null; }
+        public async void Popup(Node nodeToRelable)
+        {
+            relabledNode = null;
+            if(flowchartDrawer.graph == null) { return; }
+
+            string userInput = await contentPage.DisplayPromptAsync("Label Umbenennen", "", "OK", "Cancel", null, -1, null, nodeToRelable.LabelToString());
+            if (string.IsNullOrEmpty(userInput)) return;
+
+            Node newNode = new Node(nodeToRelable.Id, new List<string>([userInput]), nodeToRelable.GetPredecessors(), nodeToRelable.GetSuccessors(), nodeToRelable.Shape);
+            flowchartDrawer.graph.RemoveNode(nodeToRelable);
+            flowchartDrawer.graph.AddNode(newNode);
+            flowchartDrawer.ReplaceNodeInEdges(nodeToRelable, newNode);
+            graphicsView.Invalidate();
+        }
     }
+
 }

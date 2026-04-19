@@ -15,8 +15,8 @@ namespace LittleLearner.SyntaxHighlighting
 
         public TextHighlighter()
         {
-            this.syntax = syntaxSets.FindByExtension("c");
-            this.theme = themeSets["InspiredGitHub"];
+            syntax = syntaxSets.FindByExtension("c");
+            theme = themeSets["InspiredGitHub"];
         }
 
         public string initializeCodeHighligher(string? code) {
