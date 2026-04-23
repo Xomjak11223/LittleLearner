@@ -1,46 +1,29 @@
 using Antlr4.Runtime;
 using LimitCSolver.LimitCGenerator;
 using LimitCSolver.LimitCInterpreter;
-using LimitCSolver.LimitCInterpreter.Parser;
-using System.Text.RegularExpressions;
 using LimitCSolver.LimitCInterpreter.Memory;
+using LimitCSolver.LimitCInterpreter.Parser;
+using Newtonsoft.Json;
+using System.Globalization;
+using LittleLearner.LCS.Modals;
 
 namespace LittleLearner.LCS;
 
 public partial class LimitCSolver : ContentPage
 {
-	DifficultySettings? difficulty;
+    DifficultySettings difficulty = (new Settings()).Easy;
     Protocol currentProtocol;
+    String code = "";
 
 	public LimitCSolver() { 
         InitializeComponent();
         currentProtocol = new Protocol();
-        MainGrid.RemoveAt(2);
-        MainGrid.Children.Add(currentProtocol.CreateGridTable());
+        LabelGrid.RemoveAt(2);
+        LabelGrid.Children.Add(currentProtocol.CreateGridTable());
+        CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
     }
 
 	public void ToggleCodeCreator(object sender, EventArgs arguments){ CodeCreator.IsVisible = !CodeCreator.IsVisible; }
-
-	public void AutomaticCreateCode(object sender, EventArgs arguments)
-	{
-		if(difficulty == null) { return; }
-		string createdCode = (new CodeGenerator(difficulty)).GenerateCode();
-
-        createdCode = Regex.Replace(createdCode, "^{\"Code\":\"", "");
-        createdCode = Regex.Replace(createdCode, "\"}$", "");
-        createdCode = createdCode.Replace("\\r\\n", "\r\n");
-
-		string coloredCode = createdCode;
-        currentProtocol = GetProtocolFromCode(createdCode);
-
-        // Creates the new Table on the UI-Thread
-        Grid? grid = currentProtocol.CreateGridTable();
-
-        MainGrid.RemoveAt(2);
-        MainGrid.Children.Add(grid);
-
-        code.Text = coloredCode;
-    }
 
 	public void SelectDifficulty(object sender, EventArgs arguments)
 	{
@@ -55,13 +38,34 @@ public partial class LimitCSolver : ContentPage
         ((Border)sender).BackgroundColor = new Color(255, 0, 0);
 	}
 
-    private void ImportCProgram(object sender, EventArgs args){
-    }
+    private async void OpenModalCodeSettings(object sender, EventArgs args) { await Navigation.PushModalAsync(new CodeCreationConfiguratoin(difficulty)); }
+    private async void OpenModalColorMapping(object sender, EventArgs args) { await Navigation.PushModalAsync(new ColorMapping()); }
+    private void ImportCProgram(object sender, EventArgs args){ return; }
 	private void SaveCProgram(object sender, EventArgs args){return;}
 	private void ImportLables(object sender, EventArgs args){return;}
 	private void Sync(object sender, EventArgs args) { return; }
+    private void GenerateCodeC(object? sender, EventArgs args) 
+    {
+        if (difficulty == null) { return; }
 
-	public Protocol GetProtocolFromCode(string inputCode)
+        code = (new CodeGenerator(difficulty)).GenerateCode();
+        if(code == null) { return; }
+
+        Task? config = JsonConvert.DeserializeObject<Task>(code);
+        if(config == null || config?.Code == null) { return; }
+
+        code = config.Code.Trim([ ' ', '\r', '\n' ]);
+        SetCodeEditorCode(code);
+        currentProtocol = GetProtocolFromCode(code);
+
+        // Creates the new Table on the UI-Thread
+        Grid? grid = currentProtocol.CreateGridTable();
+
+        LabelGrid.RemoveAt(2);
+        LabelGrid.Children.Add(grid);
+    }
+
+    public Protocol GetProtocolFromCode(string inputCode)
 	{
         // newProtocol is the variable that holds all the lables
         Protocol newProtocol = new();
@@ -115,7 +119,7 @@ public partial class LimitCSolver : ContentPage
     private void CompareSolutions(object sender, EventArgs args)
     {
         string[] answers = new string[0];
-        var rows = ((Grid)MainGrid.ElementAt(2)).Children;
+        var rows = ((Grid)LabelGrid.ElementAt(2)).Children;
 
         foreach (Border row in rows)
         {
@@ -125,4 +129,13 @@ public partial class LimitCSolver : ContentPage
             answers.Append(content.Text);
         }
     }
+
+    public Task<string> SetCodeEditorCode(string newCode) {
+        newCode = JsonConvert.SerializeObject(new { code = newCode })
+            .Replace("\\r", "\r")
+            .Replace("\\n", "\n");
+
+        return CodeWebViewLCS.EvaluateJavaScriptAsync($"setCode({newCode})"); 
+    }
+    public Task<string> GetCodeEditorCode() { return CodeWebViewLCS.EvaluateJavaScriptAsync("getCode()"); }
 }

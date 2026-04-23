@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace LittleLearner
+namespace LCS_FillProtocol
 {
     public static class MauiProgram
     {
@@ -15,13 +15,8 @@ namespace LittleLearner
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            builder.Services.AddSingleton<LittleLearner.CFG.CfgComparer>();
-            builder.Services.AddSingleton<LittleLearner.CFG.ViewModel.Dashboard>();
-            builder.Services.AddSingleton<LittleLearner.LCS.Modals.CodeCreationConfiguratoin>();
-            builder.Services.AddSingleton<LittleLearner.LCS.ViewModel.DifficultySettingsViewModel>();
-
 #if DEBUG
-            builder.Logging.AddDebug();
+    		builder.Logging.AddDebug();
 #endif
 
             return builder.Build();

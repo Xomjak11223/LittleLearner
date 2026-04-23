@@ -1,6 +1,4 @@
-﻿using CfgCompLib;
-using CfgCompLib.classes;
-using System.Xml.Linq;
+﻿using CfgCompLib.classes;
 
 namespace LittleLearner.CFG
 {
@@ -81,6 +79,7 @@ namespace LittleLearner.CFG
             if (graph != null) 
             {
                 // Draws every shape connection
+                canvas.StrokeSize = 2;
                 foreach (Edge edge in edges)
                 {
                     float startCenterX = GraphOperations.AbsolutToRelative(edge.GetStartX(), offsetX, zoom);
@@ -91,11 +90,12 @@ namespace LittleLearner.CFG
                     if (!GraphOperations.LineIntersectsRectangle(0, 0, dirtyRect.Width, dirtyRect.Height, startCenterX, startCenterY, endCenterX, endCenterY)) { continue; }
 
                     canvas.StrokeColor = edge.selected ? (SelectedFillColor) : (DefaultBorderColor);
-                    DrawConnection(canvas, startCenterX, startCenterY, endCenterX, endCenterY);
+                    DrawConnection(canvas, startCenterX, startCenterY, endCenterX, endCenterY, edge.GetEndShapeHeight() * zoom);
                 }
 
                 // Draws every single Shape
-                foreach(var nodeIndexPair in graph.GetNodes()) {
+                canvas.StrokeSize = 1;
+                foreach (var nodeIndexPair in graph.GetNodes()) {
                     ShapeProperties shape = nodeIndexPair.Value.Shape;
                     float shapeStartX = GraphOperations.AbsolutToRelative(shape.x, offsetX, zoom);
                     float shapeEndX = GraphOperations.AbsolutToRelative(shape.x + shape.width, offsetX, zoom);
@@ -188,6 +188,18 @@ namespace LittleLearner.CFG
                     canvas.FillColor = CreationWheelDefaultArea;
                 }
                 canvas.FillCircle(creationX, creationY, creationInnerRadius);
+
+                // Draws selection circle Icons
+                int tempFontSize = fontSize;
+                fontSize = 5;
+                canvas.FillColor = Colors.White;
+
+                DrawStart(canvas, creationX - creationInnerRadius + 7, creationY - creationOuterRadius + 3, 15, 15); 
+                DrawEnd(canvas, creationX - creationInnerRadius + 7, creationY  + creationOuterRadius - 18, 15, 15);
+                DrawAction(canvas, " ", creationX + creationOuterRadius - 18, creationY - creationInnerRadius + 6, 15, 15);
+                DrawDecision(canvas, " ", creationX - creationOuterRadius + 3, creationY - creationInnerRadius + 7, 15, 15);
+
+                fontSize = tempFontSize;
             }
 
             // Scaling Wheel
@@ -210,7 +222,11 @@ namespace LittleLearner.CFG
                 canvas.DrawCircle(scalingX - offsetX, scalingY, scalingInnerRadius + ((scalingOuterRadius-scalingInnerRadius) * ((scaleUpperBound - zoom) / (scaleUpperBound-scaleLowerBound))));
             }
 
-            if (temporaryConnection){ DrawConnection(canvas, connectionStartX, connectionStartY, connectionEndX, connectionEndY); }
+            if (temporaryConnection){
+                canvas.StrokeSize = 2;
+                DrawConnection(canvas, connectionStartX, connectionStartY, connectionEndX, connectionEndY, 0);
+                canvas.StrokeSize = 1;
+            }
 
             if (editing && tempNode != null)
             {
@@ -295,10 +311,19 @@ namespace LittleLearner.CFG
             canvas.DrawString(text, textBounds, HorizontalAlignment.Center, VerticalAlignment.Center);
         }
 
-        public void DrawConnection(ICanvas canvas, float startX, float startY, float endX, float endY)
+        public void DrawConnection(ICanvas canvas, float startX, float startY, float endX, float endY, float shapeHeight)
         {
+            int arrowDirection;
+
+            if (endY > startY) { arrowDirection = -1; }
+            else { arrowDirection = 1; }
+            endY = endY + (shapeHeight * arrowDirection / 2);
+
             canvas.DrawLine(startX, startY, endX, startY);
             canvas.DrawLine(endX, startY, endX, endY);
+
+            canvas.DrawLine(endX, endY, endX + 5, endY + 10*arrowDirection);
+            canvas.DrawLine(endX, endY, endX - 5, endY + 10 * arrowDirection);
         }
 
         public void DrawCircleSlice(ICanvas canvas, float circleX, float circleY, float radius, float startAngle, float endAngle)

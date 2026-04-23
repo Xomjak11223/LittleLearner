@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LittleLearner.LCS.Modals.ColorMapping"
+             Title="Color Mapping Modal"
+             BackgroundColor="Transparent">
+    <AbsoluteLayout>
+        <Border AbsoluteLayout.LayoutBounds="0.5,0.5"
+                AbsoluteLayout.LayoutFlags="PositionProportional" 
+                WidthRequest="400" 
+                BackgroundColor="{StaticResource Primary}" 
+                Stroke="Black" 
+                StrokeShape="RoundRectangle, 16">
+            <VerticalStackLayout Spacing="20">
+                <Label Padding="4, 0, 0, 0" Text="Farbschema" HorizontalOptions="Start" FontAttributes="Bold" FontSize="Header"/>
+
+                <Label Padding="4, 0, 0, 0" Text="Korrekt" BackgroundColor="Green" HorizontalOptions="Fill" />
+                <Label Padding="4, 0, 0, 0" Text="Korrekt durch vorhergehende Korrektur"  BackgroundColor="LightGreen" HorizontalOptions="Fill" />
+                <Label Padding="4, 0, 0, 0" Text="Falsch" BackgroundColor="Red" HorizontalOptions="Fill" />
+                <Label Padding="4, 0, 0, 0" Text="Rückfindung auf korrekte Lösung (nur dann ein Punkt, wenn Typ und Wert zurückgefunden)" BackgroundColor="LightBlue" HorizontalOptions="Fill" />
+                <Label Padding="4, 0, 0, 0" Text="Nicht inkludierbar (Wert kann nicht in notwendigen Typ konvertiert werden)" BackgroundColor="MediumPurple" HorizontalOptions="Fill" />
+
+                <Button Margin="0, 0, 8, 8" Text="OK" HorizontalOptions="End" Clicked="CloseModal"  />
+            </VerticalStackLayout>
+        </Border>
+    </AbsoluteLayout>
+</ContentPage>

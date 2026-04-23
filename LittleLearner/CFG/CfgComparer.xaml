@@ -12,10 +12,13 @@
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Import Code" Order="Primary" Clicked="ImportCProgram"/>
-        <ToolbarItem Text="Save Code" Order="Primary" Clicked="SaveCProgram"/>
+        <ToolbarItem Text="Save Code .c" Order="Primary" Clicked="SaveCProgram"/>
+        <ToolbarItem Text="Save Code .XML" Order="Primary" Clicked="SaveCProgram"/>
+        <ToolbarItem Text="Save Code .dot" Order="Primary" Clicked="SaveCProgram"/>
 
         <ToolbarItem Text="Import Graph" Order="Primary" Clicked="ImportCFG"/>
-        <ToolbarItem Text="Save Graph" Order="Primary"  Clicked="SaveCFG"/>
+        <ToolbarItem Text="Save Graph .xml" Order="Primary"  Clicked="SaveCFG"/>
+        <ToolbarItem Text="Save Graph .dot" Order="Primary"  Clicked="SaveCFG"/>
         <ToolbarItem Text="Vergleichen" Order="Primary" Clicked="CompareGraphs"/>
     </ContentPage.ToolbarItems>
 
@@ -24,25 +27,27 @@
         <Border Grid.RowSpan="2" Stroke="Black" StrokeThickness="2" StrokeShape="RoundRectangle, 16" x:Name="EditorLayout" IsEnabled="True" InputTransparent="False">
             <!--Code-->
             <Grid ColumnDefinitions="*, *" ColumnSpacing="4">
-                <WebView Grid.Column="0" x:Name="CodeWebView" Navigating="CodeWritten">
-                    <WebView.Source>
-                        <HtmlWebViewSource x:Name="CodeSection" Html="&lt;span style='font-weight:bold;color:#a71d5d;'&gt;int&lt;/span&gt;" />
-                    </WebView.Source>
-                </WebView>
+                <WebView Grid.Column="0" x:Name="CodeWebViewCfg" Source="CodeEditor.html" />
 
                 <!--Graph-->
                 <Grid Grid.Column="1" RowDefinitions="Auto, *" x:Name="GraphLayout">
-                    <HorizontalStackLayout Grid.Row="0" Spacing="8" Padding="2">
-                        <Button Text="Move" Clicked="Move" />
-                        <Button Text="Scale" Clicked="Scale" />
-                        <Button Text="Select" Clicked="Select" />
-                        <Button Text="Add" Clicked="Add" />
-                        <Button Text="Connect" Clicked="Connect" />
-                        <Button Text="Edit" Clicked="Edit" />
-                        <Button Text="Delete" Clicked="Delete" />
-                    </HorizontalStackLayout>
+                    <GraphicsView Grid.Row="0"
+                                  Grid.RowSpan="2"
+                                  Drawable="{DynamicResource flowchart}" 
+                                  x:Name="FlowchartView" 
+                                  BackgroundColor="{StaticResource Primary}"/>
 
-                    <GraphicsView Drawable="{DynamicResource flowchart}" x:Name="FlowchartView" Grid.Row="1" BackgroundColor="#003C64" />
+                    <Border Grid.Row="0" Stroke="Black" HorizontalOptions="Center" Margin="0, 8, 0, 0" Padding="4" BackgroundColor="Gray">
+                        <HorizontalStackLayout Spacing="8" Padding="2">
+                            <ImageButton Source="move_screen.png" MinimumWidthRequest="0" MinimumHeightRequest="0" WidthRequest="25" HeightRequest="25" Clicked="Move" />
+                            <ImageButton Source="scale_screen.png" MinimumWidthRequest="0" MinimumHeightRequest="0" WidthRequest="25" HeightRequest="25" Clicked="Scale" />
+                            <ImageButton Source="select.png" MinimumWidthRequest="0" MinimumHeightRequest="0" WidthRequest="25" HeightRequest="25" Clicked="Select" />
+                            <ImageButton Source="add.png" MinimumWidthRequest="0" MinimumHeightRequest="0" WidthRequest="25" HeightRequest="25" Clicked="Add" />
+                            <ImageButton Source="connect.png" MinimumWidthRequest="0" MinimumHeightRequest="0" WidthRequest="25" HeightRequest="25" Clicked="Connect" />
+                            <ImageButton Source="edit.png" MinimumWidthRequest="0" MinimumHeightRequest="0" WidthRequest="25" HeightRequest="25" Clicked="Edit" />
+                            <ImageButton Source="delete.png" MinimumWidthRequest="0" MinimumHeightRequest="0" WidthRequest="25" HeightRequest="25" Clicked="Delete" />
+                        </HorizontalStackLayout>
+                    </Border>
                 </Grid>
             </Grid>
             
@@ -56,25 +61,24 @@
                 Stroke="Black"
                 StrokeThickness="2"
                 x:Name="DashboardLayout">
-            <Grid ColumnDefinitions="*,*,*,*" 
-                  RowDefinitions="Auto, *, Auto"
+            <Grid ColumnDefinitions="*,*,*,*,*" 
+                  RowDefinitions="Auto, *"
                   RowSpacing="8"
                   ColumnSpacing="8"
                   Background="{StaticResource Primary}">
 
                 <Label Grid.Row="0" Grid.Column="0" FontSize="Small" Margin="12, 4, 0, 0" Text="Graphanalyse" />
-                <Label Grid.Row="0" Grid.Column="2" Text="{Binding ReceivedPoints}" />
-                <Label Grid.Row="0" Grid.Column="3" Text="{Binding SimilarityPercent}" />
+                <Label Grid.Row="0" Grid.Column="2" Text="{Binding ReceivedPoints, StringFormat='Punkte: {0}'}" />
+                <Label Grid.Row="0" Grid.Column="3" Text="{Binding SimilarityPercent, StringFormat='Gesamt: {0}'}" />
 
                 <!--Kartenlayout Codeknoten-->
-                <Border Grid.Row="1" 
-                        Grid.RowSpan="2" 
+                <Border Grid.Row="1"
                         Grid.Column="0" 
                         Margin="8, 0,  0, 0"
                         StrokeShape="RoundRectangle, 16"
                         Stroke="{StaticResource PrimaryLight}"
                         Background="{StaticResource PrimaryLight}">
-                    <Grid RowDefinitions="Auto, *, Auto">
+                    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="4">
                         <Label Grid.Row="0" 
                                FontSize="Medium" 
                                FontAttributes="Bold" 
@@ -90,8 +94,8 @@
                                                 <Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *">
                                                     <Label Grid.Row="0" Grid.Column="0" FontSize="Medium" Text="{Binding Title}"/>
                                                     <Label Grid.Row="0" Grid.Column="1" Text="{Binding Id}" />
-                                                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding InDegree}" />
-                                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding OutDegree}" />
+                                                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding InDegree, StringFormat='Eingehend: {0}'}" />
+                                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding OutDegree, StringFormat='Ausgehend: {0}'}" />
                                                     <Label Grid.Row="2" Grid.Column="0" FontSize="Small" Text="{Binding IngoingNodesString}" />
                                                     <Label Grid.Row="2" Grid.Column="1" FontSize="Small" Text="{Binding OutgoingNodesString}" />
                                                 </Grid>
@@ -101,18 +105,20 @@
                                 </CollectionView>
                             </VerticalStackLayout>
                         </ScrollView>
-                        <Label Grid.Row="2">Knoten/Kanten</Label>
+                        <HorizontalStackLayout Grid.Row="2" Spacing="8" Margin="8, 0, 0, 0">
+                            <Label  Text="{Binding NodesInCodeGraph, StringFormat='Knoten {0}'}" />
+                            <Label  Text="{Binding EdgesInCodeGraph, StringFormat='Kanten {0}'}" />
+                        </HorizontalStackLayout>
                     </Grid>
                 </Border>
 
                 <!--Kartenlayout Graphknote-->
                 <Border Grid.Row="1"
-                        Grid.RowSpan="2"
                         Grid.Column="1"
                         StrokeShape="RoundRectangle, 16"
                         Stroke="{StaticResource PrimaryLight}"
                         Background="{StaticResource PrimaryLight}">
-                    <Grid RowDefinitions="Auto, *, Auto">
+                    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="4">
 
                         <Label Grid.Row="0" 
                                FontSize="Medium" 
@@ -129,8 +135,8 @@
                                                 <Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *">
                                                     <Label Grid.Row="0" Grid.Column="0" FontSize="Medium" Text="{Binding Title}"/>
                                                     <Label Grid.Row="0" Grid.Column="1" Text="{Binding Id}" />
-                                                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding InDegree}" />
-                                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding OutDegree}" />
+                                                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding InDegree, StringFormat='Eingehend: {0}'}" />
+                                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding OutDegree, StringFormat='Ausgehend: {0}'}" />
                                                     <Label Grid.Row="2" Grid.Column="0" FontSize="Small" Text="{Binding IngoingNodesString}" />
                                                     <Label Grid.Row="2" Grid.Column="1" FontSize="Small" Text="{Binding OutgoingNodesString}" />
                                                 </Grid>
@@ -140,7 +146,10 @@
                                 </CollectionView>
                             </VerticalStackLayout>
                         </ScrollView>
-                        <Label Grid.Row="2">Knoten/Kanten</Label>
+                        <HorizontalStackLayout Grid.Row="2" Spacing="8" Margin="8, 0, 0, 0">
+                            <Label  Text="{Binding NodesInFlowchart, StringFormat='Knoten {0}'}" />
+                            <Label  Text="{Binding EdgesInFlowchart, StringFormat='Kanten {0}'}" />
+                        </HorizontalStackLayout>
                     </Grid>
                 </Border>
 
@@ -163,13 +172,13 @@
                                         <DataTemplate x:DataType="{x:Type vm:SimilarLabels}">
                                             <Grid ColumnDefinitions="*, *, *">
                                                 <Border Grid.Column="0" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Secondary}">
-                                                    <Label Grid.Column="0" FontAttributes="Bold" Text="{Binding CodeLabel}"/>
+                                                    <Label Grid.Column="0" FontAttributes="Bold" HorizontalTextAlignment="Center" Text="{Binding CodeLabel}"/>
                                                 </Border>
 
-                                                <Label Grid.Column="1" Text="{Binding Similarity}" />
+                                                <Label Grid.Column="1" HorizontalTextAlignment="Center" Text="{Binding Similarity}" />
 
                                                 <Border Grid.Column="2" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Tertiary}">
-                                                    <Label Grid.Column="2" FontAttributes="Bold" Text="{Binding GraphLabel}" />
+                                                    <Label Grid.Column="2" FontAttributes="Bold" HorizontalTextAlignment="Center" Text="{Binding GraphLabel}" />
                                                 </Border>
                                             </Grid>
                                         </DataTemplate>
@@ -181,8 +190,8 @@
                 </Border>
 
                 <!--Kartenlayout Node Mappings-->
-                <Border Grid.Row="2" 
-                        Grid.Column="2"
+                <Border Grid.Row="1" 
+                        Grid.Column="3"
                         StrokeShape="RoundRectangle, 16"
                         Stroke="{StaticResource PrimaryLight}"
                         Background="{StaticResource PrimaryLight}">
@@ -197,12 +206,12 @@
                 </Border>
 
                 <!--Kartenlayout Edits-->
-                <Border Grid.Row="1" 
+                <Border Grid.Row="1"
                         Grid.Column="4" 
                         StrokeShape="RoundRectangle, 16"
                         Stroke="{StaticResource PrimaryLight}"
                         Background="{StaticResource PrimaryLight}">
-                    <Grid RowDefinitions="Auto, *, Auto">
+                    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="4">
                         <Label Grid.Row="0" 
                                FontSize="Medium" 
                                FontAttributes="Bold" 

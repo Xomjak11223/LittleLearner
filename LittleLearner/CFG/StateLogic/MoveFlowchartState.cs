@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LittleLearner.CFG.StateLogic
+﻿namespace LittleLearner.CFG.StateLogic
 {
     public class MoveFlowchartState : State
     {

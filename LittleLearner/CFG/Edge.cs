@@ -25,5 +25,6 @@ namespace LittleLearner.CFG
         public float GetEndX() { return EndNode.Shape.x + (EndNode.Shape.width / 2); }
         public float GetStartY() { return StartNode.Shape.y + (StartNode.Shape.height / 2); }
         public float GetEndY() { return EndNode.Shape.y + (EndNode.Shape.height / 2); }
+        public float GetEndShapeHeight() { return EndNode.Shape.height; }
     }
 }

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="31.5303mm"
+   height="31.5303mm"
+   viewBox="0 0 31.5303 31.5303"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   sodipodi:docname="Connect.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="mm"
+     inkscape:zoom="1.3095539"
+     inkscape:cx="9.5452352"
+     inkscape:cy="30.926562"
+     inkscape:window-width="1920"
+     inkscape:window-height="974"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-89.23485,-132.73485)">
+    <path
+       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:4;stroke-linecap:square;stroke-dasharray:none;stroke-dashoffset:4.2;stroke-opacity:1"
+       d="m 105,148.5 v 13.76515"
+       id="path12" />
+    <path
+       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:4;stroke-linecap:square;stroke-dasharray:none;stroke-dashoffset:4.2;stroke-opacity:1"
+       d="M 105,148.5 V 134.73485"
+       id="path13" />
+    <path
+       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:4;stroke-linecap:square;stroke-dasharray:none;stroke-dashoffset:4.2;stroke-opacity:1"
+       d="m 105,134.73485 h 13.76515"
+       id="path14" />
+    <path
+       style="fill:#000000;fill-opacity:0;stroke:#000000;stroke-width:4;stroke-linecap:square;stroke-dasharray:none;stroke-dashoffset:4.2;stroke-opacity:1"
+       d="M 105,162.26515 H 91.23485"
+       id="path15" />
+  </g>
+</svg>

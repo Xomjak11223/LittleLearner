@@ -190,14 +190,18 @@
                     return l1StartX == l2StartX && (
                         PointOnLine(l1StartX, l1StartY, l2StartX, l2StartY, l2EndX, l2EndY)
                         || PointOnLine(l1StartX, l1EndY, l2StartX, l2StartY, l2EndX, l2EndY)
-                        || (l1StartY < l2StartY && l1EndY < l2EndY));
+                        || PointOnLine(l2StartX, l2StartY, l1StartX, l1StartY, l1EndX, l1EndY)
+                        || PointOnLine(l2StartX, l2EndY, l1StartX, l1StartY, l1EndX, l1EndY)
+                        || (l1StartY < l2StartY && l1EndY < l2EndY)
+                        || (l2StartY < l1StartY && l2EndY < l1EndY));
                 }
 
                 // l2 is a horizontal line
                 if (l2StartY == l2EndY) { return l2StartX <= l1StartX && l2EndX >= l1StartX && l2StartY >= l1StartY && l2StartY <= l1EndY; }
 
                 // l2 is neither horizontal nor vertical
-                // Using the formula y = mx + b we can determini the point l2 intersects at l1StartX, then we check if that point is on l1
+                // Using the formula y = mx + b we can determin the point l2 intersects at l1StartX, then we check if that point is on l1
+                // TODO check, weather the point is on the line or not
                 float slope = (l2EndY - l2StartY) / (l2EndX - l2StartX);
                 float y = slope * (l1StartX - l2StartX) + l2StartY;
                 return (y >= l1StartY && y <= l1EndY);
@@ -214,7 +218,10 @@
                     return l1StartY == l2StartY && (
                         PointOnLine(l1StartX, l1StartY, l2StartX, l2StartY, l2EndX, l2EndY)
                         || PointOnLine(l1StartX, l1EndY, l2StartX, l2StartY, l2EndX, l2EndY)
-                        || (l1StartX < l2StartX && l1EndX < l2EndX));
+                        || PointOnLine(l2StartX, l2StartY, l1StartX, l1StartY, l1EndX, l1EndY)
+                        || PointOnLine(l2StartX, l2EndY, l1StartX, l1StartY, l1EndX, l1EndY)
+                        || (l1StartX < l2StartX && l1EndX < l2EndX)
+                        || (l2StartX < l1StartX && l2EndX < l1EndX));
                 }
 
                 // l2 is neither horizontal nor vertical
@@ -229,7 +236,7 @@
             // l2 is a horizontal line
             if (l2StartX == l2EndX)
             {
-                // l2 is neither horizontal nor vertical
+                // l1 is neither horizontal nor vertical
                 // Using the formula y = mx + b we can determini the point l2 intersects at l1StartX, then we check if that point is on l1
                 float slope = (l1EndY - l1StartY) / (l1EndX - l1StartX);
                 float y = slope * (l2StartX - l1StartX) + l1StartY;
@@ -239,7 +246,7 @@
             // l2 is a vertical line
             if (l2StartY == l2EndY)
             {
-                // l2 is neither horizontal nor vertical
+                // l1 is neither horizontal nor vertical
                 // Using the formula y = mx + b we can determini the point l2 intersects at l1StartX, then we check if that point is on l1
                 float slope = (l1EndY - l1StartY) / (l1EndX - l1StartX);
                 float x = (l2StartY - l1StartY - slope * l1StartX) / slope;
@@ -247,11 +254,12 @@
             }
             #endregion
 
+            // Neither line is horizontal or vertical
             double n = (double)((l2StartX - l1StartX)*(l1EndY - l1StartY) + (l1StartY - l2StartY)*(l1StartX - l1EndX)) / ((l2StartX - l2EndX)*(l1EndY - l1StartY) + (l2EndY - l2StartY)*(l1StartX - l1EndX));
-            if(n < 0 || n > 1) return false;
+            if(n <= 0 || n > 1) return false;
 
             double m = ((l2StartX - l1StartX) - n) / (l1EndX - l1StartX);
-            return (m >= 0 && m <= 1);
+            return (m > 0 && m <= 1);
         }
 
         public static bool PointOnLine(float px, float py, float lineStartX, float lineStartY, float lineEndX, float lineEndY)

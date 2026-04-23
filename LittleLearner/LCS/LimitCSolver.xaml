@@ -6,18 +6,21 @@
              x:DataType="Lables:Protocol">
 
     <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Auto Generate Code" Clicked="GenerateCodeC"/>
         <ToolbarItem Text="Import Code" Clicked="ImportCProgram"/>
 
         <ToolbarItem Text="Save Code" Clicked="SaveCProgram"/>
 
         <ToolbarItem Text="Import Graph" Clicked="ImportLables"/>
         <ToolbarItem Text="Sync" Order="Secondary" Clicked="Sync"/>
+        <ToolbarItem Text="Show Color Mapping" Order="Secondary" Clicked="OpenModalColorMapping"/>
+        <ToolbarItem Text="Code Generation Settings" Order="Secondary" Clicked="OpenModalCodeSettings"/>
     </ContentPage.ToolbarItems>
-    
+
     <Grid ColumnDefinitions="*, *">
         <!--Code-->
         <AbsoluteLayout>
-            <Editor x:Name="code" BackgroundColor="#003C64" AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All" />
+            <WebView AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All" x:Name="CodeWebViewLCS" Source="CodeEditorAutoUpdate.html" />
             <ImageButton Source="appicon.png" Margin="0, 12, 12, 0" Clicked="ToggleCodeCreator" AbsoluteLayout.LayoutBounds="1, 0" AbsoluteLayout.LayoutFlags="PositionProportional" />
             
             <!--Automatic Code Generation-->
@@ -60,7 +63,7 @@
         </AbsoluteLayout>
 
         <!--Lables-->
-        <Grid Grid.Column="1" RowDefinitions="*, Auto" x:Name="MainGrid">
+        <Grid Grid.Column="1" RowDefinitions="*, Auto" x:Name="LabelGrid">
             <Button Grid.Row="1" Grid.Column="0" HorizontalOptions="Start" Text="Prüfen" Clicked="CompareSolutions"/>
             <Button Grid.Row="1" Grid.Column="1" HorizontalOptions="End" Text="Lösung"/>
 

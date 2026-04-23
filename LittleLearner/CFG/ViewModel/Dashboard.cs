@@ -49,6 +49,18 @@ namespace LittleLearner.CFG.ViewModel
         [ObservableProperty]
         public double similarityPercent;
 
+        [ObservableProperty]
+        public int nodesInCodeGraph;
+
+        [ObservableProperty]
+        public int edgesInCodeGraph;
+
+        [ObservableProperty]
+        public int nodesInFlowchart;
+
+        [ObservableProperty]
+        public int edgesInFlowchart;
+
         public Dashboard()
         {
             mcsNodes = new ObservableCollection<(Node, Node)>();
@@ -73,6 +85,8 @@ namespace LittleLearner.CFG.ViewModel
             var (totalCosts, splitCosts) = GraphUtils.CalculateGED(codeGraph, flowchartGraph, out editSteps);
 
             CodeGraphNodes.Clear();
+            NodesInCodeGraph = codeGraph.NodeCount;
+            EdgesInCodeGraph = codeGraph.EdgeCount;
             foreach (var nodePair in codeGraph.GetNodes())
             {
                 NodeViewModel newNode = new NodeViewModel(nodePair.Value);
@@ -92,6 +106,8 @@ namespace LittleLearner.CFG.ViewModel
             }
 
             FlowchartGraphNodes.Clear();
+            NodesInFlowchart = flowchartGraph.NodeCount;
+            EdgesInFlowchart = flowchartGraph.EdgeCount;
             foreach (var nodePair in flowchartGraph.GetNodes())
             {
                 NodeViewModel newNode = new NodeViewModel(nodePair.Value);

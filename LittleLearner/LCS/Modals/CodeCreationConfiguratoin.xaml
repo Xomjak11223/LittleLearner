@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:LittleLearner.LCS.ViewModel"
+             x:Class="LittleLearner.LCS.Modals.CodeCreationConfiguratoin"
+             x:DataType="vm:DifficultySettingsViewModel"
+             Title="Code Configuration Modal"
+             BackgroundColor="Transparent">
+    <AbsoluteLayout>
+        <Border AbsoluteLayout.LayoutBounds="0.5, 0.5, 400, AutoSize"
+                AbsoluteLayout.LayoutFlags="PositionProportional"
+                BackgroundColor="{StaticResource Primary}" 
+                Stroke="Black" 
+                StrokeShape="RoundRectangle, 16">
+
+            <ScrollView>
+                <VerticalStackLayout Spacing="20" Margin="8, 0, 8, 0">
+                    <!--Automatic difficulty Settings-->
+                    <Label Text="Difficulty Settings" FontSize="Medium" Margin="0, 12, 0, 0" />
+                    <Picker x:Name="DifficultyPicker" Title="Automatic Settings">
+                        <Picker.Items>
+                            <x:String>Easy</x:String>
+                            <x:String>Medium</x:String>
+                            <x:String>Hard</x:String>
+                        </Picker.Items>
+                    </Picker>
+
+                    <Slider x:Name="LabelMinimum" Maximum="10" Value="10" SemanticProperties.Description="LabelMinimum" />
+                    <Slider x:Name="LabelMaximum" Maximum="10" />
+
+                    <VerticalStackLayout>
+                        <Picker x:Name="NumericOperationsPicker" Title="Numeric Operations" ItemsSource="{Binding NumericOperationsNotSelected}" SelectedIndexChanged="PickedNumericOperation" />
+                        <HorizontalStackLayout>
+                            <CollectionView ItemsSource="{Binding NumericOperationsSelected}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="{x:Type x:String}">
+                                        <Button Text="{Binding}" Clicked="RemovedNumericOperation" />
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout>
+                        <Picker x:Name="VarialeAssignmentPicker" Title="Variable Operations" ItemsSource="{Binding VariableAssignmentsNotSelected}" SelectedIndexChanged="PickedVariableAssignment" />
+                        <HorizontalStackLayout>
+                            <CollectionView ItemsSource="{Binding VariableAssignmentsSelected}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="{x:Type x:String}">
+                                        <Button Text="{Binding}" Clicked="RemovedVariableAssignment" />
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+
+                    <HorizontalStackLayout>
+                        <Label Text="Increment / Decrement" VerticalOptions="Center" />
+                        <CheckBox SemanticProperties.Description="Increment / Decrement" />
+                    </HorizontalStackLayout>
+
+                    <HorizontalStackLayout>
+                        <Label Text="Explicite type casting" VerticalOptions="Center" />
+                        <CheckBox SemanticProperties.Description="Increment / Decrement" />
+                    </HorizontalStackLayout>
+
+                    <AbsoluteLayout Margin="0, 0, 0, 12">
+                        <Button AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize" AbsoluteLayout.LayoutFlags="PositionProportional" Text="Cancle" Clicked="CloseModal"/>
+                        <Button AbsoluteLayout.LayoutBounds="1, 0, AutoSize, AutoSize" AbsoluteLayout.LayoutFlags="PositionProportional" Text="OK"/>
+                    </AbsoluteLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
+    </AbsoluteLayout>
+</ContentPage>
