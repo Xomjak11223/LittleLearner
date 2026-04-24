@@ -23,21 +23,6 @@ public partial class LimitCSolver : ContentPage
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
     }
 
-	public void ToggleCodeCreator(object sender, EventArgs arguments){ CodeCreator.IsVisible = !CodeCreator.IsVisible; }
-
-	public void SelectDifficulty(object sender, EventArgs arguments)
-	{
-		DifficultyEasy.BackgroundColor = new Color(255, 0, 255);
-        DifficultyMedium.BackgroundColor = new Color(255, 0, 255);
-        DifficultyHard.BackgroundColor = new Color(255, 0, 255);
-		
-		if(sender == DifficultyEasy){ difficulty = new Settings().Easy; }
-		else if(sender == DifficultyMedium){ difficulty = new Settings().Medium; }
-		else if (sender == DifficultyHard) { difficulty = new Settings().Hard; }
-
-        ((Border)sender).BackgroundColor = new Color(255, 0, 0);
-	}
-
     private async void OpenModalCodeSettings(object sender, EventArgs args) { await Navigation.PushModalAsync(new CodeCreationConfiguratoin(difficulty)); }
     private async void OpenModalColorMapping(object sender, EventArgs args) { await Navigation.PushModalAsync(new ColorMapping()); }
     private void ImportCProgram(object sender, EventArgs args){ return; }

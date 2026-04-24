@@ -261,7 +261,66 @@ namespace SoftwareTests
         }
         public class RectanglesIntersect
         {
+            [Theory]
+            [InlineData(10, 10, 20, 20, 15, 15, 16, 16)]
+            [InlineData(10, 10, 20, 10, 9, 9, 15, 15)]
+            [InlineData(10, 10, 20, 10, 15, 15, 22, 17)]
+            [InlineData(10, 10, 20, 10, 15, 8, 16, 15)]
+            [InlineData(20, 10, 10, 10, 15, 15, 18, 25)]
 
+            // Both Vertical lines
+            [InlineData(10, 10, 10, 20, 10, 10, 10, 20)]
+            [InlineData(10, 10, 10, 20, 10, 15, 10, 17)]
+            [InlineData(10, 10, 10, 20, 10, 5, 10, 15)]
+            [InlineData(10, 10, 10, 20, 10, 15, 10, 25)]
+            [InlineData(10, 10, 10, 20, 10, 25, 10, 15)]
+            [InlineData(10, 10, 10, 20, 10, 5, 10, 25)]
+            [InlineData(10, 10, 10, 20, 10, 25, 10, 5)]
+
+            // One Horizontal one Vertical
+            [InlineData(10, 10, 20, 10, 15, 5, 15, 17)]
+            [InlineData(17, 8, 25, 8, 19, 3, 19, 10)]
+            [InlineData(15, 5, 15, 17, 10, 10, 20, 10)]
+            [InlineData(20, 10, 10, 10, 15, 17, 15, 5)]
+
+            // Tilted Lines
+            [InlineData(10, 10, 20, 20, 10, 20, 20, 10)]
+            [InlineData(10, 20, 20, 10, 10, 10, 20, 20)]
+            [InlineData(10, 10, 20, 20, 10, 10, 0, 0)]
+            [InlineData(10, 10, 0, 0, 10, 10, 20, 20)]
+
+            // Points
+            [InlineData(10, 10, 10, 10, 10, 10, 10, 10)]
+            public void LinesIntersectTrue(float l1StartX, float l1StartY, float l1EdX, float l1EndY, float l2StartX, float l2StartY, float l2EdX, float l2EndY)
+            {
+                Assert.True(GraphOperations.LinesIntersect(l1StartX, l1StartY, l1EdX, l1EndY, l2StartX, l2StartY, l2EdX, l2EndY));
+            }
+
+            [Theory]
+            // Both horizontal lines
+            [InlineData(10, 10, 20, 10, 10, 15, 20, 15)]
+            [InlineData(10, 10, 20, 10, 10, 5, 20, 5)]
+            [InlineData(10, 10, 20, 10, 0, 10, 5, 10)]
+            [InlineData(10, 10, 20, 10, 21, 10, 22, 10)]
+            [InlineData(10, 10, 20, 10, 22, 10, 21, 10)]
+
+            // Both Vertical lines
+            [InlineData(10, 10, 10, 20, 15, 10, 15, 20)]
+            [InlineData(10, 10, 10, 20, 5, 10, 5, 20)]
+            [InlineData(10, 10, 10, 20, 10, 0, 10, 5)]
+            [InlineData(10, 10, 10, 20, 10, 21, 10, 22)]
+            [InlineData(10, 10, 10, 20, 10, 22, 10, 21)]
+
+            // One Horizontal one Vertical
+
+            // Tilted Lines
+
+            // Points
+            [InlineData(10, 10, 10, 10, 20, 20, 20, 20)]
+            public void LinesIntersectFalse(float l1StartX, float l1StartY, float l1EdX, float l1EndY, float l2StartX, float l2StartY, float l2EdX, float l2EndY)
+            {
+                Assert.False(GraphOperations.LinesIntersect(l1StartX, l1StartY, l1EdX, l1EndY, l2StartX, l2StartY, l2EdX, l2EndY));
+            }
         }
     }
 }

@@ -57,6 +57,109 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\dev\vs\editor\editor.main.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\actionbar\actionbar.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\aria\aria.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\button\button.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\codicons\codicon\codicon-modifiers.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\codicons\codicon\codicon.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\contextview\contextview.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\countBadge\countBadge.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\dnd\dnd.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\dropdown\dropdown.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\findinput\findInput.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\hover\hoverWidget.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\iconLabel\iconlabel.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\inputbox\inputBox.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\keybindingLabel\keybindingLabel.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\list\list.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\mouseCursor\mouseCursor.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\progressbar\progressbar.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\sash\sash.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\scrollbar\media\scrollbars.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\selectBox\selectBox.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\selectBox\selectBoxCustom.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\severityIcon\media\severityIcon.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\splitview\splitview.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\table\table.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\toggle\toggle.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\toolbar\toolbar.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\base\browser\ui\tree\media\tree.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\controller\editContext\native\nativeEditContext.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\controller\editContext\textArea\textAreaEditContext.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\gpu\css\media\decorationCssRuleExtractor.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\blockDecorations\blockDecorations.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\currentLineHighlight\currentLineHighlight.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\decorations\decorations.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\glyphMargin\glyphMargin.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\gpuMark\gpuMark.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\indentGuides\indentGuides.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\lineNumbers\lineNumbers.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\linesDecorations\linesDecorations.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\marginDecorations\marginDecorations.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\margin\margin.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\minimap\minimap.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\overlayWidgets\overlayWidgets.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\rulers\rulers.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\scrollDecoration\scrollDecoration.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\selections\selections.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\viewCursors\viewCursors.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\viewLines\viewLines.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\viewParts\whitespace\whitespace.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\widget\codeEditor\editor.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\widget\diffEditor\components\accessibleDiffViewer.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\widget\diffEditor\style.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\widget\markdownRenderer\browser\renderedMarkdown.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\browser\widget\multiDiffEditor\style.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\anchorSelect\browser\anchorSelect.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\bracketMatching\browser\bracketMatching.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\codeAction\browser\lightBulbWidget.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\codelens\browser\codelensWidget.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\colorPicker\browser\colorPicker.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\dnd\browser\dnd.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\dropOrPasteInto\browser\postEditWidget.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\find\browser\findOptionsWidget.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\find\browser\findWidget.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\floatingMenu\browser\floatingMenu.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\folding\browser\folding.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\gotoError\browser\media\gotoErrorWidget.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\gotoSymbol\browser\link\goToDefinitionAtPosition.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\gotoSymbol\browser\peek\referencesWidget.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\hover\browser\hover.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\inlineCompletions\browser\hintsWidget\inlineCompletionsHintsWidget.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\inlineCompletions\browser\view\ghostText\ghostTextView.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\inlineCompletions\browser\view\inlineEdits\view.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\inlineProgress\browser\inlineProgressWidget.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\inPlaceReplace\browser\inPlaceReplace.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\linkedEditing\browser\linkedEditing.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\links\browser\links.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\message\browser\messageController.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\middleScroll\browser\middleScroll.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\parameterHints\browser\parameterHints.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\peekView\browser\media\peekViewWidget.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\placeholderText\browser\placeholderText.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\rename\browser\renameWidget.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\snippet\browser\snippetSession.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\stickyScroll\browser\stickyScroll.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\suggest\browser\media\suggest.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\symbolIcons\browser\symbolIcons.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\unicodeHighlighter\browser\bannerController.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\unicodeHighlighter\browser\unicodeHighlighter.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\wordHighlighter\browser\highlightDecorations.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\contrib\zoneWidget\browser\zoneWidget.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\standalone\browser\inspectTokens\inspectTokens.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\standalone\browser\iPadShowKeyboard\iPadShowKeyboard.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\standalone\browser\quickInput\standaloneQuickInput.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\editor\standalone\browser\standalone-tokens.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\platform\actions\browser\menuEntryActionViewItem.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\platform\actionWidget\browser\actionWidget.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\platform\hover\browser\hover.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\platform\opener\browser\link.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\esm\vs\platform\quickinput\browser\media\quickInput.css" />
+	  <MauiCss Remove="Resources\Raw\wwwroot\monaco-editor\min\vs\editor\editor.main.css" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <MauiAsset Include="CodeEditor.html">
 	    <LogicalName>%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
 	  </MauiAsset>
@@ -94,8 +197,4 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
-
-	<Target Name="InstallMonacoEditor" BeforeTargets="Build">
-		<Exec Command="npm install --prefix ./Resources/Raw monaco-editor" />
-	</Target>
 </Project>

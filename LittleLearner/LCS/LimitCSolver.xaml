@@ -19,51 +19,12 @@
 
     <Grid ColumnDefinitions="*, *">
         <!--Code-->
-        <AbsoluteLayout>
-            <WebView AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All" x:Name="CodeWebViewLCS" Source="CodeEditorAutoUpdate.html" />
-            <ImageButton Source="appicon.png" Margin="0, 12, 12, 0" Clicked="ToggleCodeCreator" AbsoluteLayout.LayoutBounds="1, 0" AbsoluteLayout.LayoutFlags="PositionProportional" />
-            
-            <!--Automatic Code Generation-->
-            <VerticalStackLayout x:Name="CodeCreator" Margin="0, 12, 12, 0" Padding="8" IsVisible="False" BackgroundColor="Purple" AbsoluteLayout.LayoutBounds="1, 0" AbsoluteLayout.LayoutFlags="PositionProportional" Spacing="8">
-                <ImageButton Source="appicon.png" Clicked="ToggleCodeCreator" />
-                <HorizontalStackLayout>
-                    <Label Text="Difficulty" />
-
-                    <Border x:Name="DifficultyEasy" BackgroundColor="Purple" Stroke="Black" Margin="4, 0, 4, 0">
-                        <Label Text="Easy" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="SelectDifficulty"/>
-                        </Border.GestureRecognizers>
-                    </Border>
-                    <Border x:Name="DifficultyMedium"  BackgroundColor="Purple" Stroke="Black" Margin="4, 0, 4, 0">
-                        <Label Text="Medium" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="SelectDifficulty"/>
-                        </Border.GestureRecognizers>
-                    </Border>
-                    <Border x:Name="DifficultyHard" BackgroundColor="Purple" Stroke="Black" Margin="4, 0, 0, 0">
-                        <Label Text="Hard" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="SelectDifficulty"/>
-                        </Border.GestureRecognizers>
-                    </Border>
-                </HorizontalStackLayout>
-                <HorizontalStackLayout>
-                    <Label Text="Rechenoperationen" />
-                </HorizontalStackLayout>
-
-
-                <Grid>
-                    <CheckBox />
-                    
-                </Grid>
-
-                <Button Text="Generate" Clicked="AutomaticCreateCode" />
-            </VerticalStackLayout>
-        </AbsoluteLayout>
+        <Border Grid.Column="0" Stroke="Black" StrokeThickness="2" StrokeShape="RoundRectangle, 16">
+                <HybridWebView x:Name="CodeWebViewLCS" DefaultFile="CodeEditorAutoUpdate.html" HybridRoot="" />
+        </Border>
 
         <!--Lables-->
-        <Grid Grid.Column="1" RowDefinitions="*, Auto" x:Name="LabelGrid">
+        <Grid Grid.Column="1" RowDefinitions="*, Auto" x:Name="LabelGrid" BackgroundColor="{StaticResource Primary}">
             <Button Grid.Row="1" Grid.Column="0" HorizontalOptions="Start" Text="Prüfen" Clicked="CompareSolutions"/>
             <Button Grid.Row="1" Grid.Column="1" HorizontalOptions="End" Text="Lösung"/>
 

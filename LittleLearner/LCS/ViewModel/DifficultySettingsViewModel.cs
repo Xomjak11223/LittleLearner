@@ -31,30 +31,10 @@ namespace LittleLearner.LCS.ViewModel
             numericOperationsNotSelected = new ObservableCollection<string>();
             variableAssignmentsSelected = new ObservableCollection<string>();
             variableAssignmentsNotSelected = new ObservableCollection<string>();
-            settings = oldSettings;
 
-            // Assignes numeric Operations
-            if (settings.AllowAddition) { NumericOperationsSelected.Add(numericOperations[0]); }
-            else { NumericOperationsNotSelected.Add(numericOperations[0]); }
-
-            if (settings.AllowSubtraction) { NumericOperationsSelected.Add(numericOperations[1]); }
-            else { NumericOperationsNotSelected.Add(numericOperations[1]); }
-
-            if (settings.AllowMultiplication) { NumericOperationsSelected.Add(numericOperations[2]); }
-            else { NumericOperationsNotSelected.Add(numericOperations[2]); }
-
-            if (settings.AllowDivision) { NumericOperationsSelected.Add(numericOperations[3]); }
-            else { NumericOperationsNotSelected.Add(numericOperations[3]); }
-
-            // Assigns Varible Assignments
-            if (settings.AllowAddition) { VariableAssignmentsSelected.Add(variableAssignments[0]); }
-            else { VariableAssignmentsNotSelected.Add(variableAssignments[0]); }
-
-            if (settings.AllowSubtraction) { VariableAssignmentsSelected.Add(variableAssignments[1]); }
-            else { VariableAssignmentsNotSelected.Add(variableAssignments[1]); }
-
-            if (settings.AllowMultiplication) { VariableAssignmentsSelected.Add(variableAssignments[2]); }
-            else { VariableAssignmentsNotSelected.Add(variableAssignments[2]); }
+            if (oldSettings == null) oldSettings = new Settings().Easy;
+            settings = new DifficultySettings();
+            UpdateDifficulty(oldSettings);
         }
 
         public void AddNumericOperation(string operation)
@@ -83,6 +63,38 @@ namespace LittleLearner.LCS.ViewModel
             if (!variableAssignments.Contains(assignment)) { return; }
             VariableAssignmentsNotSelected.Add(assignment);
             VariableAssignmentsSelected.Remove(assignment);
+        }
+
+        public void UpdateDifficulty(DifficultySettings difficulty)
+        {
+            Settings = difficulty;
+            NumericOperationsSelected.Clear();
+            NumericOperationsNotSelected.Clear();
+            VariableAssignmentsSelected.Clear();
+            VariableAssignmentsNotSelected.Clear();
+
+            // Assignes numeric Operations
+            if (Settings.AllowAddition) { NumericOperationsSelected.Add(numericOperations[0]); }
+            else { NumericOperationsNotSelected.Add(numericOperations[0]); }
+
+            if (Settings.AllowSubtraction) { NumericOperationsSelected.Add(numericOperations[1]); }
+            else { NumericOperationsNotSelected.Add(numericOperations[1]); }
+
+            if (Settings.AllowMultiplication) { NumericOperationsSelected.Add(numericOperations[2]); }
+            else { NumericOperationsNotSelected.Add(numericOperations[2]); }
+
+            if (Settings.AllowDivision) { NumericOperationsSelected.Add(numericOperations[3]); }
+            else { NumericOperationsNotSelected.Add(numericOperations[3]); }
+
+            // Assigns Varible Assignments
+            if (Settings.AllowGlobalVariables) { VariableAssignmentsSelected.Add(variableAssignments[0]); }
+            else { VariableAssignmentsNotSelected.Add(variableAssignments[0]); }
+
+            if (Settings.AllowVariableAssignment) { VariableAssignmentsSelected.Add(variableAssignments[1]); }
+            else { VariableAssignmentsNotSelected.Add(variableAssignments[1]); }
+
+            if (Settings.AllowShadowVariables) { VariableAssignmentsSelected.Add(variableAssignments[2]); }
+            else { VariableAssignmentsNotSelected.Add(variableAssignments[2]); }
         }
     }
 }
