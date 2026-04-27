@@ -17,12 +17,7 @@
 
         <DataTemplate x:Key="EditorTemplate" x:DataType="{x:Type vm:TableCell}">
             <Border Grid.Row="{Binding Row}" Grid.Column="{Binding Column}" BackgroundColor="{Binding CellColor}">
-                <Grid RowDefinitions="*, *" ColumnDefinitions="*, *">
-                    <Editor Grid.Row="0" Grid.Column="0" Text="{Binding Text}" TextColor="Black" />
-                    <Editor Grid.Row="0" Grid.Column="1" Text="{Binding Text}" TextColor="Black" />
-                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding SolutinValue}" BackgroundColor="{StaticResource Secondary}" TextColor="White" />
-                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding SolutionType}" BackgroundColor="{StaticResource Secondary}" TextColor="White" />
-                </Grid>
+                <Editor Text="{Binding Text}" TextColor="Black" />
             </Border>
         </DataTemplate>
         
