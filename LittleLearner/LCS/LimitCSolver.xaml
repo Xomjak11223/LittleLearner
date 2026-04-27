@@ -1,10 +1,34 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:LittleLearner.LCS.ViewModel"
              x:Class="LittleLearner.LCS.LimitCSolver"
-             xmlns:Lables="clr-namespace:LittleLearner.LCS"
-             x:DataType="Lables:Protocol">
+             xmlns:selector="clr-namespace:LittleLearner.LCS"
+             x:DataType="vm:TableViewModel"
+             BackgroundColor="Black">
 
+    <!--Templates for the creation of a Table - The Selector determins, based on the cells internale writable, if the selected cell should be an editor or a label -->
+    <ContentPage.Resources>
+        <DataTemplate x:Key="LabelTemplate" x:DataType="{x:Type vm:TableCell}">
+            <Border Grid.Row="{Binding Row}" Grid.Column="{Binding Column}" BackgroundColor="{Binding CellColor}">
+                <Label Text="{Binding Text}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="White" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="EditorTemplate" x:DataType="{x:Type vm:TableCell}">
+            <Border Grid.Row="{Binding Row}" Grid.Column="{Binding Column}" BackgroundColor="{Binding CellColor}">
+                <Grid RowDefinitions="*, *" ColumnDefinitions="*, *">
+                    <Editor Grid.Row="0" Grid.Column="0" Text="{Binding Text}" TextColor="Black" />
+                    <Editor Grid.Row="0" Grid.Column="1" Text="{Binding Text}" TextColor="Black" />
+                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding SolutinValue}" BackgroundColor="{StaticResource Secondary}" TextColor="White" />
+                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding SolutionType}" BackgroundColor="{StaticResource Secondary}" TextColor="White" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+        
+        <selector:TableTemplateSelector x:Key="TableCellSelector" LabelTemplate="{StaticResource LabelTemplate}" EditorTemplate="{StaticResource EditorTemplate}" />
+    </ContentPage.Resources>
+    
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Auto Generate Code" Clicked="GenerateCodeC"/>
         <ToolbarItem Text="Import Code" Clicked="ImportCProgram"/>
@@ -17,18 +41,26 @@
         <ToolbarItem Text="Code Generation Settings" Order="Secondary" Clicked="OpenModalCodeSettings"/>
     </ContentPage.ToolbarItems>
 
-    <Grid ColumnDefinitions="*, *">
+    <Grid ColumnDefinitions="*, *" Margin="4" ColumnSpacing="4">
         <!--Code-->
         <Border Grid.Column="0" Stroke="Black" StrokeThickness="2" StrokeShape="RoundRectangle, 16">
-                <HybridWebView x:Name="CodeWebViewLCS" DefaultFile="CodeEditorAutoUpdate.html" HybridRoot="" />
+            <HybridWebView x:Name="CodeWebViewLCS" DefaultFile="CodeEditorAutoUpdate.html" />
         </Border>
 
         <!--Lables-->
-        <Grid Grid.Column="1" RowDefinitions="*, Auto" x:Name="LabelGrid" BackgroundColor="{StaticResource Primary}">
-            <Button Grid.Row="1" Grid.Column="0" HorizontalOptions="Start" Text="Prüfen" Clicked="CompareSolutions"/>
-            <Button Grid.Row="1" Grid.Column="1" HorizontalOptions="End" Text="Lösung"/>
+        <Border Grid.Column="1" BackgroundColor="{StaticResource Primary}" StrokeShape="RoundRectangle, 16">
+            <Grid RowDefinitions="*, Auto" x:Name="LabelGrid" Padding="8">
+                <Button Grid.Row="1" Grid.Column="0" HorizontalOptions="Start" Text="Prüfen" Command="{Binding CompareEntrysCommand}"/>
+                <Button Grid.Row="1" Grid.Column="1" HorizontalOptions="End" Text="Lösung" Command="{Binding ToggleSolutionVisibilityCommand}"/>
 
-            <Grid Grid.Row="0"></Grid>
-        </Grid>
+                <!--Incoming Cells from Databinding (TableViewModel) Cells Attribute, the TableCellSelector decides, whether to use a Editor or a label-->
+                <ScrollView Grid.Row="0" Orientation="Both">
+                    <Grid RowDefinitions="{Binding RowDefinitions}" 
+                          ColumnDefinitions="{Binding ColumnDefinitions}" 
+                          BindableLayout.ItemsSource="{Binding Cells}"
+                          BindableLayout.ItemTemplateSelector="{StaticResource TableCellSelector}" />
+                </ScrollView>
+            </Grid>
+        </Border>
     </Grid>
 </ContentPage>

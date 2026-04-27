@@ -1,21 +1,46 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:LCS_FillProtocol.Table"
              x:Class="LCS_FillProtocol.MainPage"
-             Title="Protokolleingabe">
+             x:DataType="vm:TableViewModel"
+             Title="{Binding TaskTitle}"
+             BackgroundColor="Black">
+
+    <ContentPage.Resources>
+        <DataTemplate x:Key="LabelTemplate" x:DataType="{x:Type vm:TableCell}">
+            <Border Grid.Row="{Binding Row}" Grid.Column="{Binding Column}" BackgroundColor="{Binding CellColor}">
+                <Label Text="{Binding Text}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="White" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="EditorTemplate" x:DataType="{x:Type vm:TableCell}">
+            <Border Grid.Row="{Binding Row}" Grid.Column="{Binding Column}" BackgroundColor="{Binding CellColor}">
+                <Editor Text="{Binding Text}" TextColor="Black" />
+            </Border>
+        </DataTemplate>
+
+        <vm:TableTemplateSelector x:Key="TableCellSelector" LabelTemplate="{StaticResource LabelTemplate}" EditorTemplate="{StaticResource EditorTemplate}" />
+    </ContentPage.Resources>
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Import" Clicked="ImportProtocol"/>
         <ToolbarItem Text="Export" Clicked="ExportProtocol"/>
     </ContentPage.ToolbarItems>
 
-    <Grid ColumnDefinitions="*, *">
-        <Border Grid.Column="0">
+    <Grid ColumnDefinitions="*, *" Margin="4" ColumnSpacing="4">
+        <Border Grid.Column="0" StrokeShape="RoundRectangle, 16">
             <HybridWebView x:Name="CodeWebView" DefaultFile="CodeEditor.html" />
         </Border>
-        <Border Grid.Column="1">
-            <Grid>
-            </Grid>
+        <!--Lables-->
+        <Border Grid.Column="1" BackgroundColor="{StaticResource Primary}" StrokeShape="RoundRectangle, 16">
+            <!--Incoming Cells from Databinding (TableViewModel) Cells Attribute, the TableCellSelector decides, whether to use a Editor or a label-->
+            <ScrollView Grid.Row="0" Orientation="Both" Margin="8">
+                <Grid RowDefinitions="{Binding RowDefinitions}" 
+                      ColumnDefinitions="{Binding ColumnDefinitions}"
+                      BindableLayout.ItemsSource="{Binding Cells}"
+                      BindableLayout.ItemTemplateSelector="{StaticResource TableCellSelector}"/>
+            </ScrollView>
         </Border>
     </Grid>
 </ContentPage>

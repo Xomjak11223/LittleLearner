@@ -1,14 +1,15 @@
-﻿using CfgCompLib.classes;
+﻿using CfgCompLib;
+using CfgCompLib.classes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
-using CfgCompLib;
+using System.Text.RegularExpressions;
 
 namespace LittleLearner.CFG.ViewModel
 {
     public partial class Dashboard : ObservableObject
     {
         [ObservableProperty]
-        public ObservableCollection<(Node, Node)> mcsNodes; // (NodesFromCode, NodesFromGraph)
+        public ObservableCollection<EqualNodes> mccsEqualNodes; // (NodesFromCode, NodesFromGraph)
 
         [ObservableProperty]
         public ObservableCollection<SimilarLabels> similarLabels;
@@ -61,13 +62,21 @@ namespace LittleLearner.CFG.ViewModel
         [ObservableProperty]
         public int edgesInFlowchart;
 
+        [ObservableProperty]
+        public bool canSwapFlowchart;
+
+        public Graph optimalGraph = null;
+        public static float widthOptimalNode = 100;
+        public static float heightOptimalNode = 50;
+
         public Dashboard()
         {
-            mcsNodes = new ObservableCollection<(Node, Node)>();
+            MccsEqualNodes = new ObservableCollection<EqualNodes>();
             editSteps = new ObservableCollection<string>();
             similarLabels = new ObservableCollection<SimilarLabels>();
             codeGraphNodes = new ObservableCollection<NodeViewModel>();
             flowchartGraphNodes = new ObservableCollection<NodeViewModel>();
+            CanSwapFlowchart = false;
         }
 
         public void UpdateViewModel(Graph codeGraph, Graph flowchartGraph, double equalThreshold)
@@ -83,6 +92,145 @@ namespace LittleLearner.CFG.ViewModel
             HashSet<(Node, Node)> mcs = GraphUtils.FindMCCS(codeGraph, flowchartGraph);
             HashSet<string> editSteps = [];
             var (totalCosts, splitCosts) = GraphUtils.CalculateGED(codeGraph, flowchartGraph, out editSteps);
+
+            // creates a Copy of the flowchart Graph
+            Graph solutionGraph = new Graph();
+            solutionGraph.Description = "Optimal Flow Graph";
+            // Creates every Node
+            foreach (var nodeIndexPair in flowchartGraph.GetNodes())
+            {
+                Node node = nodeIndexPair.Value;
+
+                List<string> labels = new List<string>();
+                foreach(string label in node.GetLabel()) labels.Add(label);
+
+                solutionGraph.AddNode(new(nodeIndexPair.Key, labels, null, null, new(0, 0, widthOptimalNode, heightOptimalNode, Shape.Action, false)));
+            }
+
+            // Connects every Node
+            foreach (var nodeIndexPair in flowchartGraph.GetNodes())
+            {
+                Node node = nodeIndexPair.Value;
+                foreach(Node successor in node.GetSuccessors())
+                {
+                    solutionGraph.GetNode(nodeIndexPair.Key).AddSuccessor(solutionGraph.GetNode(successor.Id));
+                }
+            }
+
+            // Alters Graph
+            foreach (string edit in editSteps)
+            {
+                if(edit.StartsWith("Insert Edge")) 
+                {
+                    Match match = Regex.Match(edit, "^Insert Edge from \\[\"(.*)\"\\] to \\[\"(.*)\"\\] in flow chart$");
+
+                    string labelStart = match.Groups[1].Value;
+                    string labelEnd = match.Groups[2].Value;
+
+                    foreach (var nodeIndexPare in solutionGraph.GetNodes())
+                    {
+                        Node node = nodeIndexPare.Value;
+                        if (node.GetLabel()[0].Equals(labelStart))
+                        {
+                            foreach (Node potentialEnd in node.GetSuccessors())
+                            {
+                                if (potentialEnd.GetLabel()[0].Equals(labelEnd))
+                                {
+                                    solutionGraph.AddEdge(node, potentialEnd);
+                                }
+                            }
+                        }
+                    }
+                }
+                else if(edit.StartsWith("Insert Node")) 
+                {
+                    Match specialInsert = Regex.Match(edit, "^Insert Node\\[\"(.*)\"\\]_ID_(\\d+) into flow chart$");
+                    if (specialInsert.Success)
+                    {
+                        string specialLabel = specialInsert.Groups[1].Value;
+                        int id = int.Parse(specialInsert.Groups[2].Value);
+                        solutionGraph.AddNode(new(id, [specialLabel], null, null, new(0, 0, widthOptimalNode, heightOptimalNode, Shape.Action, false)));
+                        continue;
+                    }
+
+                    Match match = Regex.Match(edit, "^Insert Node \\[\"(.*)\"\\] into flow chart$");
+
+                    string label = match.Groups[1].Value;
+                    solutionGraph.AddNode(new(solutionGraph.GetNewID(), [label], null, null, new(0, 0, widthOptimalNode, heightOptimalNode, Shape.Action, false)));
+                }
+                else if (edit.StartsWith("Relabel Node")) 
+                {
+                    Match match = Regex.Match(edit, "Relabel Node \\[\"(.*)\"\\] to \\[\"(.*)\"\\] in flow chart");
+                    string labelFrom = match.Groups[1].Value;
+                    string labelTo = match.Groups[2].Value;
+
+                    Node[] relabeledNodes = [];
+                    foreach (var nodeIndexPare in solutionGraph.GetNodes())
+                    {
+                        Node node = nodeIndexPare.Value;
+                        if (node.GetLabel()[0].Equals(labelFrom))
+                        {
+                            relabeledNodes = relabeledNodes.Append(new(node.Id, [labelTo], node.GetPredecessors(), node.GetSuccessors(), node.Shape)).ToArray();
+                            solutionGraph.RemoveNode(node);
+                        }
+                    }
+
+                    foreach (Node node in relabeledNodes) solutionGraph.AddNode(node);
+                }
+                else if(edit.StartsWith("Delete Edge")) 
+                {
+                    Match match = Regex.Match(edit, "^Delete Edge from \\[\"(.*)\"\\] to \\[\"(.*)\"\\] from flow chart$");
+
+                    string labelStart = match.Groups[1].Value;
+                    string labelEnd = match.Groups[2].Value;
+
+                    foreach (var nodeIndexPare in solutionGraph.GetNodes())
+                    {
+                        Node node = nodeIndexPare.Value;
+                        if (node.GetLabel()[0].Equals(labelStart))
+                        {
+                            foreach (Node potentialEnd in node.GetSuccessors())
+                            {
+                                if (potentialEnd.GetLabel()[0].Equals(labelEnd))
+                                {
+                                    solutionGraph.RemoveEdge(node, potentialEnd);
+                                }
+                            }
+                        }
+                    }
+                }
+                else if(edit.StartsWith("Delete Node")) 
+                {
+                    Match match = Regex.Match(edit, "^Delete Node \\[\"(.*)\"\\] from flow chart$");
+                    
+                    string label = match.Groups[1].Value;
+                    foreach(var nodeIndexPare in solutionGraph.GetNodes())
+                    {
+                        Node node = nodeIndexPare.Value;
+                        if (node.GetLabel()[0].Equals(label)) solutionGraph.RemoveNode(node);
+                    }
+                }
+            }
+
+            // Positoins Nodes in a Grid
+            var nodeDictionary = solutionGraph.GetNodes();
+            float x = 0;
+            float y = 0;
+            int direction = 1;
+            for(int i = 0; i < nodeDictionary.Count; i++)
+            {
+                Node node = nodeDictionary[i];
+                node.Shape.x = x;
+                node.Shape.y = y;
+
+                if ((i+1) % 10 == 0) { x += widthOptimalNode; direction = 1; }
+                else if((i+1) % 10 == 5) { x += widthOptimalNode; direction = -1; }
+
+                y += direction * heightOptimalNode;
+
+            }
+
+            optimalGraph = solutionGraph;
 
             CodeGraphNodes.Clear();
             NodesInCodeGraph = codeGraph.NodeCount;
@@ -126,8 +274,10 @@ namespace LittleLearner.CFG.ViewModel
                 FlowchartGraphNodes.Add(newNode);
             }
 
-            McsNodes.Clear();
-            foreach ((Node, Node) nodePair in mcs){ McsNodes.Add(nodePair); }
+            MccsEqualNodes.Clear();
+            foreach ((Node, Node) nodePair in mcs) {
+                MccsEqualNodes.Add(new($"{nodePair.Item1.LabelToString()} [{nodePair.Item1.Id}]", $"{nodePair.Item2.LabelToString()} [{nodePair.Item2.Id}]"));
+            }
 
             SimilarLabels.Clear();
             if(flowchartGraph.NodeCount != 0)

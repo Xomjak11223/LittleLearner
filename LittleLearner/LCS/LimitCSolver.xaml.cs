@@ -1,37 +1,69 @@
-using Antlr4.Runtime;
+using CommunityToolkit.Maui.Storage;
 using LimitCSolver.LimitCGenerator;
-using LimitCSolver.LimitCInterpreter;
-using LimitCSolver.LimitCInterpreter.Memory;
-using LimitCSolver.LimitCInterpreter.Parser;
+using LittleLearner.LCS.Modals;
+using LittleLearner.LCS.ViewModel;
 using Newtonsoft.Json;
 using System.Globalization;
-using LittleLearner.LCS.Modals;
+using System.Text;
 
 namespace LittleLearner.LCS;
 
 public partial class LimitCSolver : ContentPage
 {
     DifficultySettings difficulty = (new Settings()).Easy;
-    Protocol currentProtocol;
-    String code = "";
+    string code = "";
+    TableViewModel table;
 
-	public LimitCSolver() { 
+	public LimitCSolver(TableViewModel vm) { 
         InitializeComponent();
-        currentProtocol = new Protocol();
-        LabelGrid.RemoveAt(2);
-        LabelGrid.Children.Add(currentProtocol.CreateGridTable());
+        
+        table = vm;
+        BindingContext = vm;
+
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        CodeWebViewLCS.SetInvokeJavaScriptTarget(this);
     }
 
     private async void OpenModalCodeSettings(object sender, EventArgs args) { await Navigation.PushModalAsync(new CodeCreationConfiguratoin(difficulty)); }
     private async void OpenModalColorMapping(object sender, EventArgs args) { await Navigation.PushModalAsync(new ColorMapping()); }
-    private void ImportCProgram(object sender, EventArgs args){ return; }
-	private void SaveCProgram(object sender, EventArgs args){return;}
+    private async void ImportCProgram(object sender, EventArgs args) 
+    {
+        FileResult? file = await GetFileWithExtensionFromAllPlatforms(".c", "C Programmcode");
+        if (file == null) { return; }
+
+        Stream codeStream = await file.OpenReadAsync();
+        StreamReader reader = new StreamReader(codeStream);
+        string content = reader.ReadToEnd();
+
+        await SetCodeEditorCode(content);
+        table.InitializeTableFromCode(content);
+    }
+
+	private async void SaveCProgram(object sender, EventArgs args)
+    {
+        string outString = await GetCodeEditorCode();
+
+        using var stream = new MemoryStream(Encoding.Default.GetBytes(outString));
+        await FileSaver.Default.SaveAsync($"NewPogram.c", stream, CancellationToken.None);
+    }
+
 	private void ImportLables(object sender, EventArgs args){return;}
-	private void Sync(object sender, EventArgs args) { return; }
+	private async void Sync(object sender, EventArgs args) 
+    {
+        string code = await GetCodeEditorCode();
+        code = code.Replace("\\r", "\r").Replace("\\n", "\n");
+
+        table.InitializeTableFromCode(code); 
+    }
     private void GenerateCodeC(object? sender, EventArgs args) 
     {
         if (difficulty == null) { return; }
+        GetCodeEditorCode();
 
         code = (new CodeGenerator(difficulty)).GenerateCode();
         if(code == null) { return; }
@@ -41,64 +73,7 @@ public partial class LimitCSolver : ContentPage
 
         code = config.Code.Trim([ ' ', '\r', '\n' ]);
         SetCodeEditorCode(code);
-        currentProtocol = GetProtocolFromCode(code);
-
-        // Creates the new Table on the UI-Thread
-        Grid? grid = currentProtocol.CreateGridTable();
-
-        LabelGrid.RemoveAt(2);
-        LabelGrid.Children.Add(grid);
-    }
-
-    public Protocol GetProtocolFromCode(string inputCode)
-	{
-        // newProtocol is the variable that holds all the lables
-        Protocol newProtocol = new();
-        var interpreter = new LimitCInterpreter();
-        var program = parse(inputCode);
-
-        interpreter.LabelCheckPointReached += (sender, args) =>
-        {
-            string[] variables = new string[0];
-            //var npe = new ProtocolEntryViewModel() { Num =  };
-
-            foreach (var (name, addr) in args.VisibleVars)
-            {
-                TypedValue memVal = args.MemoryStorage.Memory[addr];
-                var p = new string('*', memVal.Type.Count(c => c == '*'));
-
-                //npe.VarEntrys.Add(new VarViewModel($"{p}{name}", "", "", ""));
-
-                variables = variables.Append(p + name).ToArray<string>();
-            }
-            newProtocol.AddEmptyLabel(args.LabelNum, variables);
-        };
-
-
-
-        if (program == null)
-            return newProtocol; // an error occured during tree build, we cannot continue safely
-
-        interpreter.evaluate(program);
-
-        return newProtocol;
-    }
-
-    private static LimitCParser.ProgContext? parse(string code)
-    {
-        var inputStream = new AntlrInputStream(code);
-        var lexer = new LimitCLexer(inputStream);
-        var tkStream = new CommonTokenStream(lexer);
-        var parser = LimitCParser.Instance(tkStream);
-
-        parser.AddErrorListener(new DiagnosticErrorListener());
-
-        var limitCContext = parser.prog();
-
-        if (parser.Errors.Count != 0)
-            return null; // This is dirty. Errors should be handled and displayed to the user.
-        else
-            return limitCContext;
+        table.InitializeTableFromCode(code);
     }
 
     private void CompareSolutions(object sender, EventArgs args)
@@ -115,12 +90,40 @@ public partial class LimitCSolver : ContentPage
         }
     }
 
-    public Task<string> SetCodeEditorCode(string newCode) {
-        newCode = JsonConvert.SerializeObject(new { code = newCode })
-            .Replace("\\r", "\r")
-            .Replace("\\n", "\n");
-
-        return CodeWebViewLCS.EvaluateJavaScriptAsync($"setCode({newCode})"); 
+    public Task<string> SetCodeEditorCode(string newCode)
+    {
+        newCode = System.Text.Json.JsonSerializer.Serialize(newCode);
+        return CodeWebViewLCS.EvaluateJavaScriptAsync($"setCode({newCode})");
     }
-    public Task<string> GetCodeEditorCode() { return CodeWebViewLCS.EvaluateJavaScriptAsync("getCode()"); }
+
+    public Task<string> GetCodeEditorCode() { return CodeWebViewLCS.EvaluateJavaScriptAsync($"getCode()"); }
+
+    // This Methode gets called from the JavaScript of the page
+    // It gets called every time the user changes the code in the source code generator by typing or pasting content into it
+    // This Method currently does not work due to bugs from hybridWebView
+    public void OnUserWriteUpdate(string newCode)
+    {
+        SetCodeEditorCode(code);
+        table.InitializeTableFromCode(code);
+    }
+
+    public Task<FileResult?> GetFileWithExtensionFromAllPlatforms(string fileExtension, string filePickerTitle)
+    {
+        FilePickerFileType fileTypes = new FilePickerFileType(
+            new Dictionary<DevicePlatform, IEnumerable<string>>
+            {
+                { DevicePlatform.iOS, new[]{ fileExtension } },
+                { DevicePlatform.Android, new[]{ fileExtension } },
+                { DevicePlatform.MacCatalyst, new[]{ fileExtension } },
+                { DevicePlatform.macOS, new[]{ fileExtension } },
+                { DevicePlatform.WinUI, new[]{ fileExtension } }
+            }
+        );
+
+        return FilePicker.Default.PickAsync(new PickOptions
+        {
+            PickerTitle = filePickerTitle,
+            FileTypes = fileTypes
+        });
+    }
 }

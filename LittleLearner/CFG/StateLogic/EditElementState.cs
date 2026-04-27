@@ -11,8 +11,7 @@ namespace LittleLearner.CFG.StateLogic
         Node? relabledNode;
         PositionMarking position1, position2;
         ContentPage contentPage;
-        Task resetTask = null;
-        string newLabel;
+        Task? resetTask = null;
 
         public EditElementState(FlowchartDrawer flowchartDrawer, GraphicsView graphicsView, ContentPage contentPage) : base(flowchartDrawer, graphicsView)
         {

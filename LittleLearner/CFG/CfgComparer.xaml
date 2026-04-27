@@ -4,7 +4,8 @@
              xmlns:fc="clr-namespace:LittleLearner.CFG"
              xmlns:vm="clr-namespace:LittleLearner.CFG.ViewModel"
              x:DataType="vm:Dashboard"
-             x:Class="LittleLearner.CFG.CfgComparer">
+             x:Class="LittleLearner.CFG.CfgComparer"
+             BackgroundColor="Black">
 
     <ContentPage.Resources>
         <fc:FlowchartDrawer x:Key="flowchart" />
@@ -13,21 +14,23 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Import Code" Order="Primary" Clicked="ImportCProgram"/>
         <ToolbarItem Text="Save Code .c" Order="Primary" Clicked="SaveCProgram"/>
-        <ToolbarItem Text="Save Code .XML" Order="Primary" Clicked="SaveCProgram"/>
-        <ToolbarItem Text="Save Code .dot" Order="Primary" Clicked="SaveCProgram"/>
+        <ToolbarItem Text="Save Code .dot" Order="Primary" Clicked="SaveCodeToDot"/>
 
         <ToolbarItem Text="Import Graph" Order="Primary" Clicked="ImportCFG"/>
-        <ToolbarItem Text="Save Graph .xml" Order="Primary"  Clicked="SaveCFG"/>
-        <ToolbarItem Text="Save Graph .dot" Order="Primary"  Clicked="SaveCFG"/>
+        <ToolbarItem Text="Save Graph .dot" Order="Primary"  Clicked="SaveGraphToDot"/>
+        <ToolbarItem Text="Save optimal .dot" Order="Primary"  Clicked="SaveOutpt" IsEnabled="{Binding CanSwapFlowchart}" />
+        <ToolbarItem Text="Show optimal Graph" Order="Primary"  Clicked="ToggleGraphPresent" IsEnabled="{Binding CanSwapFlowchart}"/>
         <ToolbarItem Text="Vergleichen" Order="Primary" Clicked="CompareGraphs"/>
+
+        <ToolbarItem Text="Konfiguration" Order="Secondary" Clicked="ChangeConfigurations"/>
     </ContentPage.ToolbarItems>
 
-    <Grid RowDefinitions="*, 2*" x:Name="CfgMainGrid" BackgroundColor="Black" Padding="4" RowSpacing="8">
+    <Grid RowDefinitions="*, 2*" x:Name="CfgMainGrid" Padding="4" RowSpacing="8">
         <!-- Editor BackgroundColor="#003C64" Grid.Column="0" /-->
         <Border Grid.RowSpan="2" Stroke="Black" StrokeThickness="2" StrokeShape="RoundRectangle, 16" x:Name="EditorLayout" IsEnabled="True" InputTransparent="False">
             <!--Code-->
             <Grid ColumnDefinitions="*, *" ColumnSpacing="4">
-                <WebView Grid.Column="0" x:Name="CodeWebViewCfg" Source="CodeEditor.html" />
+                <HybridWebView Grid.Column="0" x:Name="CodeWebViewCfg" DefaultFile="CodeEditor.html" />
 
                 <!--Graph-->
                 <Grid Grid.Column="1" RowDefinitions="Auto, *" x:Name="GraphLayout">
@@ -40,7 +43,7 @@
                     <Border Grid.Row="0" Stroke="Black" HorizontalOptions="Center" Margin="0, 8, 0, 0" Padding="4" BackgroundColor="Gray">
                         <HorizontalStackLayout Spacing="8" Padding="2">
                             <ImageButton Source="move_screen.png" MinimumWidthRequest="0" MinimumHeightRequest="0" WidthRequest="25" HeightRequest="25" Clicked="Move" />
-                            <ImageButton Source="scale_screen.png" MinimumWidthRequest="0" MinimumHeightRequest="0" WidthRequest="25" HeightRequest="25" Clicked="Scale" />
+                            <ImageButton Source="scale_screen.png" MinimumWidthRequest="0" MinimumHeightRequest="0" WidthRequest="25" HeightRequest="25" Clicked="ScaleGraphObject" />
                             <ImageButton Source="select.png" MinimumWidthRequest="0" MinimumHeightRequest="0" WidthRequest="25" HeightRequest="25" Clicked="Select" />
                             <ImageButton Source="add.png" MinimumWidthRequest="0" MinimumHeightRequest="0" WidthRequest="25" HeightRequest="25" Clicked="Add" />
                             <ImageButton Source="connect.png" MinimumWidthRequest="0" MinimumHeightRequest="0" WidthRequest="25" HeightRequest="25" Clicked="Connect" />
@@ -54,7 +57,7 @@
         </Border>
         
         <!--Dashboard-->
-        <Border IsVisible="False" 
+        <Border IsVisible="{Binding CanSwapFlowchart}" 
                 Grid.Column="0" 
                 Grid.Row="1"
                 StrokeShape="RoundRectangle, 16"
@@ -68,8 +71,13 @@
                   Background="{StaticResource Primary}">
 
                 <Label Grid.Row="0" Grid.Column="0" FontSize="Small" Margin="12, 4, 0, 0" Text="Graphanalyse" />
-                <Label Grid.Row="0" Grid.Column="2" Text="{Binding ReceivedPoints, StringFormat='Punkte: {0}'}" />
-                <Label Grid.Row="0" Grid.Column="3" Text="{Binding SimilarityPercent, StringFormat='Gesamt: {0}'}" />
+                <HorizontalStackLayout Grid.Row="0" Grid.Column="3">
+                    <Label FontSize="Small" VerticalOptions="Center" TextColor="{StaticResource AccentPositive}" Text="{Binding ReceivedPoints}" />
+                    <Label FontSize="Small" VerticalOptions="Center" TextColor="{StaticResource AccentPositive}" Text="/" />
+                    <Label FontSize="Small" VerticalOptions="Center" TextColor="{StaticResource AccentPositive}" Text="{Binding MaxPoints}" />
+                </HorizontalStackLayout>
+
+                <Label Grid.Row="0" Grid.Column="4" FontSize="Small" VerticalOptions="Center" TextColor="{StaticResource AccentPositive}" Text="{Binding SimilarityPercent, StringFormat='{0}%'}" />
 
                 <!--Kartenlayout Codeknoten-->
                 <Border Grid.Row="1"
@@ -85,25 +93,23 @@
                                HorizontalTextAlignment="Center"
                                Text="Codeknoten" />
 
-                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="CodeGraphCards">
-                            <VerticalStackLayout>
-                                <CollectionView ItemsSource="{Binding CodeGraphNodes}">
-                                    <CollectionView.ItemTemplate>
-                                        <DataTemplate x:DataType="{x:Type vm:NodeViewModel}">
-                                            <Border StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Secondary}">
-                                                <Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *">
-                                                    <Label Grid.Row="0" Grid.Column="0" FontSize="Medium" Text="{Binding Title}"/>
-                                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Id}" />
-                                                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding InDegree, StringFormat='Eingehend: {0}'}" />
-                                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding OutDegree, StringFormat='Ausgehend: {0}'}" />
-                                                    <Label Grid.Row="2" Grid.Column="0" FontSize="Small" Text="{Binding IngoingNodesString}" />
-                                                    <Label Grid.Row="2" Grid.Column="1" FontSize="Small" Text="{Binding OutgoingNodesString}" />
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </CollectionView.ItemTemplate>
-                                </CollectionView>
-                            </VerticalStackLayout>
+                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="CodeGraphCards" Margin="4">
+                            <CollectionView ItemsSource="{Binding CodeGraphNodes}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="{x:Type vm:NodeViewModel}">
+                                        <Border StrokeShape="RoundRectangle, 16" Padding="4" BackgroundColor="{StaticResource Secondary}">
+                                            <Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *">
+                                                <Label Grid.Row="0" Grid.Column="0" FontSize="Medium" Text="{Binding Title}"/>
+                                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Id}" />
+                                                <Label Grid.Row="1" Grid.Column="0" Text="{Binding InDegree, StringFormat='Eingehend: {0}'}" />
+                                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding OutDegree, StringFormat='Ausgehend: {0}'}" />
+                                                <Label Grid.Row="2" Grid.Column="0" FontSize="Small" Text="{Binding IngoingNodesString}" />
+                                                <Label Grid.Row="2" Grid.Column="1" FontSize="Small" Text="{Binding OutgoingNodesString}" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
                         </ScrollView>
                         <HorizontalStackLayout Grid.Row="2" Spacing="8" Margin="8, 0, 0, 0">
                             <Label  Text="{Binding NodesInCodeGraph, StringFormat='Knoten {0}'}" />
@@ -126,25 +132,23 @@
                                HorizontalTextAlignment="Center"
                                Text="Graphknoten" />
 
-                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="FlowGraphCards">
-                            <VerticalStackLayout>
-                                <CollectionView ItemsSource="{Binding FlowchartGraphNodes}">
-                                    <CollectionView.ItemTemplate>
-                                        <DataTemplate x:DataType="{x:Type vm:NodeViewModel}">
-                                            <Border StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Tertiary}">
-                                                <Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *">
-                                                    <Label Grid.Row="0" Grid.Column="0" FontSize="Medium" Text="{Binding Title}"/>
-                                                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Id}" />
-                                                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding InDegree, StringFormat='Eingehend: {0}'}" />
-                                                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding OutDegree, StringFormat='Ausgehend: {0}'}" />
-                                                    <Label Grid.Row="2" Grid.Column="0" FontSize="Small" Text="{Binding IngoingNodesString}" />
-                                                    <Label Grid.Row="2" Grid.Column="1" FontSize="Small" Text="{Binding OutgoingNodesString}" />
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </CollectionView.ItemTemplate>
-                                </CollectionView>
-                            </VerticalStackLayout>
+                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="FlowGraphCards" Margin="4">
+                            <CollectionView ItemsSource="{Binding FlowchartGraphNodes}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="{x:Type vm:NodeViewModel}">
+                                        <Border StrokeShape="RoundRectangle, 16" Padding="4" BackgroundColor="{StaticResource Tertiary}">
+                                            <Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *">
+                                                <Label Grid.Row="0" Grid.Column="0" FontSize="Medium" Text="{Binding Title}"/>
+                                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Id}" />
+                                                <Label Grid.Row="1" Grid.Column="0" Text="{Binding InDegree, StringFormat='Eingehend: {0}'}" />
+                                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding OutDegree, StringFormat='Ausgehend: {0}'}" />
+                                                <Label Grid.Row="2" Grid.Column="0" FontSize="Small" Text="{Binding IngoingNodesString}" />
+                                                <Label Grid.Row="2" Grid.Column="1" FontSize="Small" Text="{Binding OutgoingNodesString}" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
                         </ScrollView>
                         <HorizontalStackLayout Grid.Row="2" Spacing="8" Margin="8, 0, 0, 0">
                             <Label  Text="{Binding NodesInFlowchart, StringFormat='Knoten {0}'}" />
@@ -165,26 +169,24 @@
                                FontAttributes="Bold" 
                                HorizontalTextAlignment="Center"
                                Text="Labels Matching" />
-                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="MatchingLabels">
-                            <VerticalStackLayout>
-                                <CollectionView ItemsSource="{Binding SimilarLabels}">
-                                    <CollectionView.ItemTemplate>
-                                        <DataTemplate x:DataType="{x:Type vm:SimilarLabels}">
-                                            <Grid ColumnDefinitions="*, *, *">
-                                                <Border Grid.Column="0" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Secondary}">
-                                                    <Label Grid.Column="0" FontAttributes="Bold" HorizontalTextAlignment="Center" Text="{Binding CodeLabel}"/>
-                                                </Border>
+                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="MatchingLabels" Margin="4">
+                            <CollectionView ItemsSource="{Binding SimilarLabels}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="{x:Type vm:SimilarLabels}">
+                                        <Grid ColumnDefinitions="*, *, *">
+                                            <Border Grid.Column="0" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Secondary}">
+                                                <Label Grid.Column="0" FontAttributes="Bold" HorizontalTextAlignment="Center" Text="{Binding CodeLabel}"/>
+                                            </Border>
 
-                                                <Label Grid.Column="1" HorizontalTextAlignment="Center" Text="{Binding Similarity}" />
+                                            <Label Grid.Column="1" HorizontalTextAlignment="Center" Text="{Binding Similarity} " />
 
-                                                <Border Grid.Column="2" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Tertiary}">
-                                                    <Label Grid.Column="2" FontAttributes="Bold" HorizontalTextAlignment="Center" Text="{Binding GraphLabel}" />
-                                                </Border>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </CollectionView.ItemTemplate>
-                                </CollectionView>
-                            </VerticalStackLayout>
+                                            <Border Grid.Column="2" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Tertiary}">
+                                                <Label Grid.Column="2" FontAttributes="Bold" HorizontalTextAlignment="Center" Text="{Binding GraphLabel}" />
+                                            </Border>
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
                         </ScrollView>
                     </Grid>
                 </Border>
@@ -201,7 +203,22 @@
                                FontAttributes="Bold" 
                                HorizontalTextAlignment="Center"
                                Text="Node Matchings" />
-                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="MatchingNodes"></ScrollView>
+                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="MatchingNodes" Margin="4">
+                            <CollectionView ItemsSource="{Binding MccsEqualNodes}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="{x:Type vm:EqualNodes}">
+                                        <Grid ColumnDefinitions="*, *">
+                                            <Border Grid.Column="0" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Secondary}">
+                                                <Label Grid.Column="0" FontAttributes="Bold" HorizontalTextAlignment="Center" Text="{Binding codeGraphNode}"/>
+                                            </Border>
+                                            <Border Grid.Column="2" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Tertiary}">
+                                                <Label Grid.Column="2" FontAttributes="Bold" HorizontalTextAlignment="Center" Text="{Binding flowchartNode}" />
+                                            </Border>
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </ScrollView>
                     </Grid>
                 </Border>
 
@@ -217,42 +234,40 @@
                                FontAttributes="Bold" 
                                HorizontalTextAlignment="Center"
                                Text="Edits" />
-                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="Edits">
-                            <VerticalStackLayout>
-                                <CollectionView ItemsSource="{Binding EditSteps}">
-                                    <CollectionView.ItemTemplate>
-                                        <DataTemplate x:DataType="{x:Type x:String}">
-                                            <Border StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource PrimaryDark}">
-                                                <Label Text="{Binding}"/>
-                                            </Border>
-                                        </DataTemplate>
-                                    </CollectionView.ItemTemplate>
-                                </CollectionView>
-                            </VerticalStackLayout>
+                        <ScrollView Grid.Row="1" Orientation="Vertical" x:Name="Edits" Margin="4">
+                            <CollectionView ItemsSource="{Binding EditSteps}">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="{x:Type x:String}">
+                                        <Border StrokeShape="RoundRectangle, 16" Padding="4" BackgroundColor="{StaticResource PrimaryDark}">
+                                            <Label Text="{Binding}"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
                         </ScrollView>
-                        <Grid Grid.Row="2" RowDefinitions="*, *" ColumnDefinitions="*, *, *">
-                            <Border Grid.Row="0" Grid.Column="0" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Primary}">
-                                <Label FontAttributes="Bold" Text="{Binding CostNodeInsert}"/>
+                        <Grid Grid.Row="2" RowDefinitions="*, *" ColumnDefinitions="*, *, *" Margin="4">
+                            <Border Grid.Row="0" Grid.Column="0" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Primary}" Stroke="{StaticResource Primary}">
+                                <Label FontAttributes="Bold" Text="{Binding CostNodeInsert}" HorizontalTextAlignment="Center"/>
                             </Border>
 
-                            <Border Grid.Row="0" Grid.Column="1" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Primary}">
-                                <Label FontAttributes="Bold" Text="{Binding CostNodeDelete}"/>
+                            <Border Grid.Row="0" Grid.Column="1" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Primary}" Stroke="{StaticResource Primary}" >
+                                <Label FontAttributes="Bold" Text="{Binding CostNodeDelete}" HorizontalTextAlignment="Center" />
                             </Border>
                             
-                            <Border Grid.Row="0" Grid.Column="2" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Primary}">
-                                <Label FontAttributes="Bold" Text="{Binding CostNodeRelabel}"/>
+                            <Border Grid.Row="0" Grid.Column="2" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Primary}" Stroke="{StaticResource Primary}" >
+                                <Label FontAttributes="Bold" Text="{Binding CostNodeRelabel}" HorizontalTextAlignment="Center" />
                             </Border>
                             
-                            <Border Grid.Row="1" Grid.Column="0" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Primary}">
-                                <Label FontAttributes="Bold" Text="{Binding costEdgeInsert}"/>
+                            <Border Grid.Row="1" Grid.Column="0" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Primary}" Stroke="{StaticResource Primary}" >
+                                <Label FontAttributes="Bold" Text="{Binding CostEdgeInsert}" HorizontalTextAlignment="Center" />
                             </Border>
                             
-                            <Border Grid.Row="1" Grid.Column="1" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Primary}">
-                                <Label FontAttributes="Bold" Text="{Binding CostEdgeDelete}"/>
+                            <Border Grid.Row="1" Grid.Column="1" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Primary}" Stroke="{StaticResource Primary}" >
+                                <Label FontAttributes="Bold" Text="{Binding CostEdgeDelete}" HorizontalTextAlignment="Center" />
                             </Border>
                             
-                            <Border Grid.Row="1" Grid.Column="2" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Primary}">
-                                <Label FontAttributes="Bold" TextColor="{StaticResource AccentNegative}" Text="{Binding TotalCost}"/>
+                            <Border Grid.Row="1" Grid.Column="2" StrokeShape="RoundRectangle, 16" BackgroundColor="{StaticResource Primary}" Stroke="{StaticResource Primary}" >
+                                <Label FontAttributes="Bold" TextColor="{StaticResource AccentNegative}" Text="{Binding TotalCost}" HorizontalTextAlignment="Center" />
                             </Border>
                         </Grid>
                     </Grid>

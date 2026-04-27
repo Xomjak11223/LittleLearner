@@ -7,9 +7,9 @@ namespace LittleLearner.LCS
     {
         private string[] variables = new string[0];
         private Dictionary<int, String[]> rows = new Dictionary<int, String[]>();
-        private static Color primaryRowColor = Color.FromRgba("#CBCBCB");
-        private static Color secondaryRowColor = Color.FromRgba("#E1E1E1");
-        private static Color notExistingRowColor = Color.FromRgba("#222222");
+        private static readonly Color primaryRowColor = Color.FromRgba("#CBCBCB");
+        private static readonly Color secondaryRowColor = Color.FromRgba("#E1E1E1");
+        private static readonly Color notExistingRowColor = Color.FromRgba("#222222");
 
         public Protocol() { }
 

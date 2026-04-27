@@ -33,10 +33,10 @@
                 automaticLayout: true
             });
 
-            // window.editor.onDidChangeModelContent((event) => console.log("Content geändert") );
+            //window.editor.onDidChangeModelContent((event) => window.HybridWebView.InvokeDotNet('OnUserWriteUpdate', ["Hallo Welt"]))
         });
 
-        function setCode(code) { window.editor.setValue(code.code); }
+        function setCode(code) { window.editor.setValue(code); }
         function getCode() { return window.editor.getValue(); }
     </script>
 </body>
